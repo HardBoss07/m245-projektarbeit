@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Lexend', sans-serif;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#fcf8fa",
+                        "inverse-primary": "#bec6e0",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "inverse-surface": "#303032",
+                        "secondary": "#5d5f5f",
+                        "on-error": "#ffffff",
+                        "primary-container": "#131b2e",
+                        "on-secondary-container": "#616363",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e4e2e4",
+                        "on-surface": "#1b1b1d",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "surface-container-low": "#f6f3f5",
+                        "on-primary-container": "#7c839b",
+                        "surface": "#fcf8fa",
+                        "on-secondary-fixed-variant": "#454747",
+                        "on-background": "#1b1b1d",
+                        "surface-dim": "#dcd9db",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#98805d",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#e2e2e2",
+                        "tertiary-container": "#271901",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#76777d",
+                        "primary-fixed-dim": "#bec6e0",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#565e74",
+                        "surface-container": "#f0edef",
+                        "surface-variant": "#e4e2e4",
+                        "tertiary": "#000000",
+                        "tertiary-fixed": "#fcdeb5",
+                        "outline-variant": "#c6c6cd",
+                        "primary": "#000000",
+                        "on-tertiary-fixed": "#271901",
+                        "surface-container-high": "#eae7e9",
+                        "on-primary-fixed": "#131b2e",
+                        "on-surface-variant": "#45464d",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "inverse-on-surface": "#f3f0f2",
+                        "secondary-container": "#dfe0e0",
+                        "primary-fixed": "#dae2fd",
+                        "background": "#fcf8fa",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "margin": "20px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "gutter": "12px",
+                        "unit": "4px",
+                        "xs": "4px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "h2": ["Lexend"],
+                        "h1": ["Lexend"],
+                        "body-lg": ["Lexend"],
+                        "display": ["Lexend"],
+                        "body-md": ["Lexend"],
+                        "label-sm": ["Lexend"]
+                    },
+                    "fontSize": {
+                        "h2": ["20px", {"lineHeight": "28px", "letterSpacing": "0em", "fontWeight": "600"}],
+                        "h1": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "display": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- TopAppBar Section -->
+<header class="bg-surface docked full-width top-0 z-50 border-b border-outline-variant flex items-center justify-between px-margin h-16 w-full">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="school">school</span>
+<h1 class="font-display text-h1 text-primary tracking-tight">WISS Tocco</h1>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-colors active:scale-95">search</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full transition-colors active:scale-95">more_vert</button>
+</div>
+</header>
+<main class="px-margin pt-lg">
+<!-- Search Section -->
+<div class="mb-lg">
+<div class="bg-surface-container-low flex items-center px-md py-sm rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant mr-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface" placeholder="Search files and folders..." type="text"/>
+<span class="material-symbols-outlined text-on-surface-variant">tune</span>
+</div>
+</div>
+<!-- Section Title: DATEIEN -->
+<div class="mb-md flex items-center justify-between">
+<h2 class="font-h2 text-h2 text-on-surface">DATEIEN</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant">32 Files • 4 Folders</span>
+</div>
+<!-- List View -->
+<div class="space-y-sm">
+<!-- Folder Item -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl flex items-center justify-between hover:bg-surface-container-low transition-colors group cursor-pointer shadow-[0px_2px_8px_rgba(15,23,42,0.05)]">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">folder</span>
+</div>
+<div>
+<p class="font-body-lg text-on-surface font-semibold">Semester Project 2024</p>
+<p class="font-label-sm text-on-surface-variant">Yesterday • 12 files</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary">chevron_right</span>
+</div>
+<!-- Folder Item -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl flex items-center justify-between hover:bg-surface-container-low transition-colors group cursor-pointer shadow-[0px_2px_8px_rgba(15,23,42,0.05)]">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">folder</span>
+</div>
+<div>
+<p class="font-body-lg text-on-surface font-semibold">Course Documents</p>
+<p class="font-label-sm text-on-surface-variant">Oct 12 • 8 files</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary">chevron_right</span>
+</div>
+<!-- PDF Item -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl flex items-center justify-between hover:bg-surface-container-low transition-colors group cursor-pointer shadow-[0px_2px_8px_rgba(15,23,42,0.05)]">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">picture_as_pdf</span>
+</div>
+<div>
+<p class="font-body-lg text-on-surface font-semibold">Exam_Rules.pdf</p>
+<p class="font-label-sm text-on-surface-variant">2.4 MB • 2 days ago</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary">download</span>
+</div>
+<!-- Image Item -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl flex items-center justify-between hover:bg-surface-container-low transition-colors group cursor-pointer shadow-[0px_2px_8px_rgba(15,23,42,0.05)]">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container border border-outline-variant">
+<img alt="Campus architecture" class="w-full h-full object-cover" data-alt="A sophisticated architectural photograph of a modern university campus building with clean lines and large glass facades. The scene is captured in soft morning light, creating a professional and bright academic atmosphere. The composition emphasizes structural integrity and minimalist design, matching the modern digital fluidity of the WISS Tocco interface. Deep blacks and clean whites dominate the frame." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIjp9ZJ7zGirBEh_IBMQfX8Munrn3MXNnmYxB6hebkLFTPoBgryZoATFhnxP1zztftDaogt0aAoWsYEMzqXS89BYxspFlORPyhBq5MZa_j31KN_zrCigf3CbWTKy-DGjWGljyOtnhTTNZVxuvjJnULxyxvdQaeRUzxzmQdlicZuCw0XExkr40xuL0QMl98ajLVVNwGtxVzFxFOrhBaavNMdb6ectK0iDiBy4wB5Z00QDPXSUTMqcMx5L3wSUZGhuW3TQ6_hfitKWA"/>
+</div>
+<div>
+<p class="font-body-lg text-on-surface font-semibold">Campus_Map_HighRes.jpg</p>
+<p class="font-label-sm text-on-surface-variant">5.1 MB • 1 week ago</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary">visibility</span>
+</div>
+<!-- Word Doc Item -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl flex items-center justify-between hover:bg-surface-container-low transition-colors group cursor-pointer shadow-[0px_2px_8px_rgba(15,23,42,0.05)]">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">description</span>
+</div>
+<div>
+<p class="font-body-lg text-on-surface font-semibold">Thesis_Draft_v2.docx</p>
+<p class="font-label-sm text-on-surface-variant">840 KB • Today</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary">edit</span>
+</div>
+<!-- Upload Button -->
+<button class="w-full mt-lg border-2 border-dashed border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center hover:bg-surface-container-low transition-colors active:scale-[0.98] duration-200">
+<span class="material-symbols-outlined text-primary mb-sm text-[32px]">upload_file</span>
+<p class="font-h2 text-h2 text-on-surface">Upload a file</p>
+<p class="font-body-md text-on-surface-variant">Max size: 50MB</p>
+</button>
+</div>
+</main>
+<!-- BottomNavBar Section -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/80 backdrop-blur-md border-t border-outline-variant flex justify-around items-center h-20 px-2 pb-safe w-full shadow-sm">
+<!-- Files Tab (Active) -->
+<div class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-4 py-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">folder</span>
+<span class="font-label-sm text-label-sm">Files</span>
+</div>
+<!-- Timetable Tab -->
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-sm text-label-sm">Timetable</span>
+</div>
+<!-- Grades Tab -->
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="grade">grade</span>
+<span class="font-label-sm text-label-sm">Grades</span>
+</div>
+<!-- Profile Tab -->
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</div>
+</nav>
+</body></html>

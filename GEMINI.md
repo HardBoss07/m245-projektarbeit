@@ -23,15 +23,18 @@ The **Wiss Tocco Redesign** is a comprehensive modernization of the `wiss.tocco.
 
 ## 3. Design System & Principles
 
-### Palette: Grayscale & Bordeaux
+### Palette: Slate & Indigo (High-End Redesign)
 
-The UI follows a minimalist grayscale theme with a single accent color.
+The UI follows a modern Shadcn-inspired minimalist theme.
 
-- **Grayscale**: White (#FFFFFF), Light Gray (#F9FAFB), Mid Gray (#9CA3AF), Deep Black (#000000).
-- **Bordeaux Accent**:
-  - `bordeaux-light`: #a62639
-  - `bordeaux-base`: #800020 (Primary Accent)
-  - `bordeaux-dark`: #4a0404
+- **Grayscale**: White (#FFFFFF), Slate-50 (#F8FAFC), Slate-200 (#E2E8F0), Slate-900 (#020617).
+- **Primary Accent**: Indigo-600 (#4f46e5).
+
+### Key Components
+
+- **SmartImage**: Production-grade wrapper for `next/image` with fallback states.
+- **BentoCard**: Container for structured, high-hierarchy grid layouts.
+- **Atoms**: Refined Button and Input components with subtle borders and shadows.
 
 ### Atomic Design Methodology
 
@@ -46,42 +49,42 @@ The UI follows a minimalist grayscale theme with a single accent color.
 
 _Goal: Establish the local environment and design tokens._
 
-- [ ] **1.1 Docker Environment**:
-  - [ ] Create `docker-compose.yml` for local development.
-  - [ ] Create `Dockerfile.frontend` using a Node-based image.
-  - [ ] Configure `.env` file with placeholders for future JWT secrets.
-- [ ] **1.2 Next.js Project Setup**:
-  - [ ] Initialize Next.js 16.2.5 with App Router and TypeScript.
-  - [ ] Configure `tailwind.config.ts` with the Bordeaux color steps.
-- [ ] **1.3 Directory Scaffolding**:
-  - [ ] Setup `@/components/atoms`, `@/components/molecules`, and `@/components/organisms`.
-  - [ ] Setup `@/styles` for global CSS and @layer components.
+- [x] **1.1 Docker Environment**:
+  - [x] Create `docker-compose.yml` for local development.
+  - [x] Create `Dockerfile.frontend` using a Node-based image.
+  - [x] Configure `.env` file with placeholders for future JWT secrets.
+- [x] **1.2 Next.js Project Setup**:
+  - [x] Initialize Next.js 16.2.5 with App Router and TypeScript.
+  - [x] Configure `tailwind.config.ts` (via globals.css for TW4) with the Bordeaux color steps.
+- [x] **1.3 Directory Scaffolding**:
+  - [x] Setup `@/components/atoms`, `@/components/molecules`, and `@/components/organisms`.
+  - [x] Setup `@/styles` for global CSS and @layer components.
 
 ### Phase 2: Atomic UI Construction (Mobile-First)
 
 _Goal: Build the visual building blocks based on @docs/wireframes._
 
-- [ ] **2.1 Atoms**:
-  - [ ] Design high-contrast buttons (Bordeaux/White).
-  - [ ] Design accessible input fields with focus states.
-- [ ] **2.2 Molecules**:
-  - [ ] Build a responsive navigation bar optimized for mobile thumbs.
-  - [ ] Build simple "Stat Cards" for grades and attendance.
-- [ ] **2.3 Organisms**:
-  - [ ] Implement the Global Layout (Sidebar/Mobile Bottom Nav).
-  - [ ] Create a "Mobile Dashboard Shell" as the main entry point.
+- [x] **2.1 Atoms**:
+  - [x] Design high-contrast buttons (Bordeaux/White).
+  - [x] Design accessible input fields with focus states.
+- [x] **2.2 Molecules**:
+  - [x] Build a responsive navigation bar optimized for mobile thumbs.
+  - [x] Build simple "Stat Cards" for grades and attendance.
+- [x] **2.3 Organisms**:
+  - [x] Implement the Global Layout (Sidebar/Mobile Bottom Nav).
+  - [x] Create a "Mobile Dashboard Shell" as the main entry point.
 
 ### Phase 3: Page Prototyping (Mock Data)
 
 _Goal: Assemble components into functional pages without a live backend._
 
-- [ ] **3.1 Login Page**:
-  - [ ] Clean, centered grayscale design with Bordeaux login button.
-- [ ] **3.2 Main Dashboard**:
-  - [ ] Grid layout for schedules, news, and recent grades.
-- [ ] **3.3 Mock Data Integration**:
-  - [ ] Create TypeScript interfaces for User, Grade, and Schedule.
-  - [ ] Use local JSON or constants to populate the UI.
+- [x] **3.1 Login Page**:
+  - [x] Clean, centered grayscale design with Bordeaux login button.
+- [x] **3.2 Main Dashboard**:
+  - [x] Grid layout for schedules, news, and recent grades.
+- [x] **3.3 Mock Data Integration**:
+  - [x] Create TypeScript interfaces for User, Grade, and Schedule.
+  - [x] Use local JSON or constants to populate the UI.
 
 ### Phase 4: Backend Infrastructure (Dummy Mode)
 
