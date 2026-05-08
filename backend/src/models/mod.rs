@@ -1,3 +1,5 @@
+pub mod auth;
+
 use chrono::{DateTime, NaiveDate, Utc};
 use rust_decimal::Decimal; // Alternative: use f64 for NUMERIC types
 use serde::{Deserialize, Serialize};

@@ -1,1 +1,2 @@
-// Reusable business logic
+pub mod auth;
+pub mod hash;
