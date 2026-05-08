@@ -1,4 +1,6 @@
+pub mod absenzen;
 pub mod auth;
+pub mod pagination;
 
 use chrono::{DateTime, NaiveDate, Utc};
 use rust_decimal::Decimal; // Alternative: use f64 for NUMERIC types
@@ -7,8 +9,8 @@ use sqlx::FromRow;
 use uuid::Uuid;
 
 // Enum for document_type
-#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone)]
-#[sqlx(type_name = "VARCHAR")]
+#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[sqlx(type_name = "varchar")]
 #[serde(rename_all = "camelCase")]
 pub enum DocumentType {
     #[sqlx(rename = "GENERAL")]
@@ -43,6 +45,10 @@ pub struct Room {
 pub struct Class {
     pub id: Uuid,
     pub designation: String,
+    pub short_name: Option<String>,
+    pub class_type: Option<absenzen::ClassType>,
+    pub description: Option<String>,
+    pub min_attendance_pct: Option<Decimal>,
 }
 
 /// Represents a subject (e.g., 'GB-ZH-IFZK-M-B21-03-IK-GE-231').

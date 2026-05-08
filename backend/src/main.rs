@@ -1,25 +1,9 @@
-mod errors;
-mod handlers;
-mod middleware;
-mod models;
-mod routes;
-mod services;
-
-use axum::Router;
+use moka::future::Cache;
 use sqlx::postgres::PgPoolOptions;
 use std::net::SocketAddr;
 use std::time::Duration;
-use tower_http::compression::CompressionLayer;
-use tower_http::cors::CorsLayer;
-use tower_http::timeout::TimeoutLayer;
-use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-
-#[derive(Clone)]
-pub struct AppState {
-    pub db: sqlx::PgPool,
-    pub jwt_secret: String,
-}
+use wiss_tocco_backend::{AppState, create_app};
 
 #[tokio::main]
 async fn main() {
@@ -36,7 +20,6 @@ async fn main() {
 
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let jwt_secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
-    let frontend_url = std::env::var("FRONTEND_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
 
     let pool = PgPoolOptions::new()
         .max_connections(5)
@@ -45,38 +28,19 @@ async fn main() {
         .await
         .expect("Failed to create pool");
 
+    // Initialize cache with 1000 items and 1 hour TTL
+    let cache = Cache::builder()
+        .max_capacity(1000)
+        .time_to_live(Duration::from_secs(3600))
+        .build();
+
     let state = AppState {
         db: pool,
         jwt_secret,
+        cache,
     };
 
-    // CORS configuration
-    let cors = CorsLayer::new()
-        .allow_origin(frontend_url.parse::<axum::http::HeaderValue>().unwrap())
-        .allow_methods([
-            axum::http::Method::GET,
-            axum::http::Method::POST,
-            axum::http::Method::PATCH,
-            axum::http::Method::DELETE,
-        ])
-        .allow_headers([
-            axum::http::header::AUTHORIZATION,
-            axum::http::header::CONTENT_TYPE,
-        ])
-        .allow_credentials(true);
-
-    // Build our application with routes
-    let app = Router::new()
-        .nest("/api/v1/health", routes::health::router())
-        .nest("/api/v1/auth", routes::auth::router())
-        .with_state(state)
-        .layer(cors)
-        .layer(TraceLayer::new_for_http())
-        .layer(TimeoutLayer::with_status_code(
-            axum::http::StatusCode::REQUEST_TIMEOUT,
-            Duration::from_secs(30),
-        ))
-        .layer(CompressionLayer::new());
+    let app = create_app(state).await;
 
     // Run it with hyper
     let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
