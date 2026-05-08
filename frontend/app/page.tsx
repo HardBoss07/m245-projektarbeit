@@ -1,9 +1,47 @@
-import React from "react";
-import { School, Info } from "lucide-react";
+"use client";
+
+import React, { useState } from "react";
+import { School, Info, Mail, Lock, Loader2 } from "lucide-react";
 import { Button } from "@/components/atoms/Button";
+import { Input } from "@/components/atoms/Input";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("http://localhost:3001/api/v1/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Invalid credentials");
+      }
+
+      const data = await response.json();
+      localStorage.setItem("token", data.token);
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Failed to log in");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="bg-surface text-on-surface flex flex-col min-h-screen">
       <header className="bg-surface border-b border-outline-variant flex items-center justify-between px-5 h-16 w-full fixed top-0 z-50">
@@ -36,23 +74,59 @@ export default function LoginPage() {
           <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-soft">
             <div className="flex flex-col gap-6">
               {/* Microsoft Primary Action */}
-              <Link href="/dashboard" className="w-full">
-                <Button variant="primary" size="lg" fullWidth className="gap-4">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 23 23">
-                    <path d="M1 1h10v10H1z" fill="#f35325"></path>
-                    <path d="M12 1h10v10H12z" fill="#81bc06"></path>
-                    <path d="M1 12h10v10H1z" fill="#05a6f0"></path>
-                    <path d="M12 12h10v10H12z" fill="#ffba08"></path>
-                  </svg>
-                  Log in with Microsoft
-                </Button>
-              </Link>
+              <Button variant="secondary" size="lg" fullWidth className="gap-4">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 23 23">
+                  <path d="M1 1h10v10H1z" fill="#f35325"></path>
+                  <path d="M12 1h10v10H12z" fill="#81bc06"></path>
+                  <path d="M1 12h10v10H1z" fill="#05a6f0"></path>
+                  <path d="M12 12h10v10H12z" fill="#ffba08"></path>
+                </svg>
+                Log in with Microsoft
+              </Button>
 
               <div className="relative flex items-center">
                 <div className="flex-grow border-t border-outline-variant"></div>
                 <span className="flex-shrink mx-4 text-on-surface-variant text-label-sm uppercase tracking-wider">School Authentication</span>
                 <div className="flex-grow border-t border-outline-variant"></div>
               </div>
+
+              {/* Login Form */}
+              <form onSubmit={handleLogin} className="flex flex-col gap-4">
+                <div className="space-y-2">
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    icon={<Mail size={18} />}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    icon={<Lock size={18} />}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+
+                {error && (
+                  <p className="text-label-sm text-error bg-error/10 p-3 rounded-lg border border-error/20">
+                    {error}
+                  </p>
+                )}
+
+                <Button 
+                  type="submit" 
+                  variant="primary" 
+                  size="lg" 
+                  fullWidth 
+                  disabled={isLoading}
+                >
+                  {isLoading ? <Loader2 className="animate-spin" /> : "Sign In"}
+                </Button>
+              </form>
 
               {/* Information Subtext */}
               <div className="flex gap-4 p-4 bg-surface-container-low rounded-lg border border-outline-variant/30">
