@@ -1,12 +1,27 @@
+"use client";
+
 import React from "react";
 import { MobileShell } from "@/components/organisms/MobileShell";
 import { SearchBar } from "@/components/molecules/SearchBar";
 import { ListEntry } from "@/components/molecules/ListEntry";
-import { Folder, FileText, FileImage, FileCode, UploadCloud, Download, Eye } from "lucide-react";
+import { Folder, FileText, FileImage, FileCode, UploadCloud, Download, Eye, Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function FilesPage() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-surface">
+        <Loader2 className="animate-spin text-primary" size={48} />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) return null;
+
   const items = [
-    {
+...
       type: "folder",
       title: "Semester Project 2024",
       subtitle: "Yesterday • 12 files",

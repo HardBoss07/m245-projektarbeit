@@ -1,10 +1,25 @@
+"use client";
+
 import React from "react";
 import { MobileShell } from "@/components/organisms/MobileShell";
 import { BentoCard } from "@/components/molecules/BentoCard";
-import { Clock, MapPin, Search, Bell } from "lucide-react";
+import { Clock, MapPin, Search, Bell, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function SchedulePage() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-surface">
+        <Loader2 className="animate-spin text-primary" size={48} />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) return null;
+
   const days = [
     { name: "Mon", date: "16", active: false },
     { name: "Tue", date: "17", active: true },

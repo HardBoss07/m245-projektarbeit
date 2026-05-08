@@ -1,10 +1,25 @@
+"use client";
+
 import React from "react";
 import { MobileShell } from "@/components/organisms/MobileShell";
 import { BentoCard } from "@/components/molecules/BentoCard";
 import { ListEntry } from "@/components/molecules/ListEntry";
-import { GraduationCap, Terminal, BookOpen, Calculator, Globe, TrendingUp } from "lucide-react";
+import { GraduationCap, Terminal, BookOpen, Calculator, Globe, TrendingUp, Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function GradesPage() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-surface">
+        <Loader2 className="animate-spin text-primary" size={48} />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) return null;
+
   const subjects = [
     { name: "Informatik", subtitle: "Modul 122, 117", grade: "5.8", icon: <Terminal />, dots: 3 },
     { name: "Deutsch", subtitle: "Kommunikation", grade: "5.2", icon: <BookOpen />, dots: 2 },

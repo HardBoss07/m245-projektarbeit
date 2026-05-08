@@ -1,11 +1,33 @@
+"use client";
+
 import React from "react";
 import { MobileShell } from "@/components/organisms/MobileShell";
 import { BentoCard } from "@/components/molecules/BentoCard";
 import { ListEntry } from "@/components/molecules/ListEntry";
-import { User, Settings, Bell, ShieldCheck, LogOut, Edit3, GraduationCap, CalendarCheck } from "lucide-react";
+import { User, Settings, Bell, ShieldCheck, LogOut, Edit3, GraduationCap, CalendarCheck, Loader2 } from "lucide-react";
 import { Button } from "@/components/atoms/Button";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/");
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-surface">
+        <Loader2 className="animate-spin text-primary" size={48} />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) return null;
+
   const preferences = [
     { title: "Settings", icon: <Settings size={20} />, color: "bg-secondary-container" },
     { title: "Notifications", icon: <Bell size={20} />, color: "bg-secondary-container" },
@@ -67,7 +89,7 @@ export default function ProfilePage() {
 
         {/* Logout Action */}
         <section className="mt-8">
-          <Button variant="error" size="xl" fullWidth className="gap-2">
+          <Button variant="error" size="xl" fullWidth className="gap-2" onClick={handleLogout}>
             <LogOut size={20} />
             Logout
           </Button>
