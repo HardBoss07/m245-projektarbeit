@@ -1,5 +1,5 @@
 [package]
-name = "backend"
+name = "wiss-tocco-backend"
 version = "0.1.0"
 edition = "2024"
 
@@ -43,3 +43,4 @@ futures = "0.3"
 # Testing
 tower-service = "0.3"
 http-body-util = "0.1"
+rust_decimal = "1.42.0"
