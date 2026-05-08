@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html class="light" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            font-family: 'Lexend', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#1b1b1d",
+                        "inverse-surface": "#303032",
+                        "tertiary": "#000000",
+                        "surface-bright": "#fcf8fa",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-tint": "#565e74",
+                        "surface": "#fcf8fa",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "on-tertiary-fixed": "#271901",
+                        "on-secondary-fixed-variant": "#454747",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "primary": "#000000",
+                        "tertiary-fixed": "#fcdeb5",
+                        "secondary-fixed": "#e2e2e2",
+                        "on-surface-variant": "#45464d",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#bec6e0",
+                        "surface-container": "#f0edef",
+                        "on-secondary-container": "#616363",
+                        "primary-fixed-dim": "#bec6e0",
+                        "primary-fixed": "#dae2fd",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#e4e2e4",
+                        "outline": "#76777d",
+                        "inverse-on-surface": "#f3f0f2",
+                        "surface-container-low": "#f6f3f5",
+                        "secondary-container": "#dfe0e0",
+                        "tertiary-container": "#271901",
+                        "surface-dim": "#dcd9db",
+                        "secondary": "#5d5f5f",
+                        "surface-container-highest": "#e4e2e4",
+                        "on-primary-container": "#7c839b",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#1b1b1d",
+                        "primary-container": "#131b2e",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#98805d",
+                        "on-error-container": "#93000a",
+                        "background": "#fcf8fa",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "surface-container-high": "#eae7e9",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "outline-variant": "#c6c6cd"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "md": "16px",
+                        "margin": "20px",
+                        "xs": "4px",
+                        "gutter": "12px",
+                        "xl": "32px",
+                        "unit": "4px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "h2": ["Lexend"],
+                        "body-lg": ["Lexend"],
+                        "label-sm": ["Lexend"],
+                        "display": ["Lexend"],
+                        "h1": ["Lexend"],
+                        "body-md": ["Lexend"]
+                    },
+                    "fontSize": {
+                        "h2": ["20px", {"lineHeight": "28px", "letterSpacing": "0em", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "display": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "h1": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-surface docked full-width top-0 z-50 border-b border-outline-variant flex items-center justify-between px-margin h-16 w-full sticky">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="school">school</span>
+<h1 class="font-display text-h1 text-primary tracking-tight">WISS Tocco</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-150 ease-in-out">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="px-margin pt-lg space-y-lg max-w-2xl mx-auto">
+<!-- Welcome & Active Context -->
+<section class="space-y-xs">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Dashboard</p>
+<h2 class="font-h1 text-h1 text-on-surface">Absenzen Übersicht</h2>
+</section>
+<!-- Summary Grid (Bento Style) -->
+<section class="grid grid-cols-2 gap-gutter">
+<!-- Total Card -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl space-y-sm shadow-sm">
+<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-fixed" data-icon="history">history</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Total Absenzen</p>
+<p class="font-display text-display text-primary">12 <span class="text-body-md font-body-md">Lektionen</span></p>
+</div>
+</div>
+<!-- Open Excuses Card -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl space-y-sm shadow-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-error/5 rounded-full -mr-12 -mt-12"></div>
+<div class="w-10 h-10 bg-error-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-error" data-icon="warning">warning</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Offene Belege</p>
+<p class="font-display text-display text-error">2 <span class="text-body-md font-body-md">Pendent</span></p>
+</div>
+</div>
+</section>
+<!-- Call to Action Section -->
+<section class="bg-primary-container p-lg rounded-xl flex items-center justify-between shadow-sm relative overflow-hidden">
+<div class="z-10">
+<h3 class="font-h2 text-h2 text-white mb-xs">Absenz melden</h3>
+<p class="font-body-md text-body-md text-primary-fixed-dim max-w-[200px]">Neue Abwesenheit erfassen oder Dokumente hochladen.</p>
+</div>
+<button class="z-10 bg-[#00e5ff] text-primary h-[48px] px-lg rounded-lg font-h2 text-body-lg shadow-lg active:scale-95 duration-150 transition-all">
+                Erfassen
+            </button>
+<div class="absolute right-[-20px] top-[-20px] opacity-10">
+<span class="material-symbols-outlined text-[120px]" data-icon="add_circle">add_circle</span>
+</div>
+</section>
+<!-- Recent Absences List -->
+<section class="space-y-md">
+<div class="flex items-center justify-between">
+<h3 class="font-h2 text-h2 text-on-surface">Letzte Einträge</h3>
+<button class="text-primary font-label-sm text-label-sm flex items-center gap-xs">
+                    Alle ansehen
+                    <span class="material-symbols-outlined !text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="space-y-sm">
+<!-- Item 1: Open -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl flex items-center justify-between gap-md">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container-high rounded-full flex flex-col items-center justify-center text-center">
+<span class="font-label-sm text-[10px] leading-none text-on-surface-variant uppercase">Mai</span>
+<span class="font-h2 text-h2 leading-none">24</span>
+</div>
+<div>
+<p class="font-h2 text-body-lg text-on-surface">Modul 245</p>
+<p class="font-body-md text-body-md text-on-surface-variant">2 Lektionen • Vormittag</p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-xs">
+<span class="bg-error-container text-on-error-container px-sm py-xs rounded-full font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined !text-[14px]" data-icon="error">error</span>
+                            Offen
+                        </span>
+</div>
+</div>
+<!-- Item 2: Excused -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl flex items-center justify-between gap-md">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container-high rounded-full flex flex-col items-center justify-center text-center">
+<span class="font-label-sm text-[10px] leading-none text-on-surface-variant uppercase">Mai</span>
+<span class="font-h2 text-h2 leading-none">22</span>
+</div>
+<div>
+<p class="font-h2 text-body-lg text-on-surface">Modul 117</p>
+<p class="font-body-md text-body-md text-on-surface-variant">4 Lektionen • Ganztag</p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-xs">
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined !text-[14px]" data-icon="check_circle">check_circle</span>
+                            Entschuldigt
+                        </span>
+</div>
+</div>
+<!-- Item 3: Processing -->
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl flex items-center justify-between gap-md">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container-high rounded-full flex flex-col items-center justify-center text-center">
+<span class="font-label-sm text-[10px] leading-none text-on-surface-variant uppercase">Mai</span>
+<span class="font-h2 text-h2 leading-none">15</span>
+</div>
+<div>
+<p class="font-h2 text-body-lg text-on-surface">Modul 431</p>
+<p class="font-body-md text-body-md text-on-surface-variant">2 Lektionen • Nachmittag</p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-xs">
+<span class="bg-surface-variant text-on-surface-variant px-sm py-xs rounded-full font-label-sm text-label-sm flex items-center gap-xs">
+<span class="material-symbols-outlined !text-[14px]" data-icon="pending">pending</span>
+                            In Prüfung
+                        </span>
+</div>
+</div>
+</div>
+</section>
+<!-- Illustration Card -->
+<section class="rounded-xl overflow-hidden h-40 relative group">
+<img class="w-full h-full object-cover grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-75 transition-all duration-700" data-alt="A clean, minimalist desk in a modern academic library with a single open notebook and a professional pen. The lighting is soft and natural, emphasizing the quiet, focused atmosphere of higher education. The background features blurred shelves of classic leather-bound books, blending traditional knowledge with contemporary productivity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtieZP4vdqPiKAxhBA-NZRHrCadydbRBdLetXeCcOHwg8aJROb7eeiBEw63tNqOOEiPTndyE0CQedJl0LrQGADrm3DhJPF-qU7PwWDRbBHEKAXd-qqEdmzCETJT-KShduoDVOyOee6PXksn6NXy_s4Regawn-ONFtBCTlt8QRJnLQ-blpP3CDL_TODwSj9LKsRkdOzbpn42V4nNpDgoOEe2A-J6qh9vKii00M_zxJgqFWgNvROD6y823qcVoKGEY0akUVc2kn7GRU"/>
+<div class="absolute inset-0 flex flex-col justify-end p-md bg-gradient-to-t from-black/80 to-transparent">
+<p class="text-white font-h2 text-h2">Präsenz ist der Schlüssel</p>
+<p class="text-white/70 font-body-md text-body-md">Behalte deine Fehlzeiten im Griff für einen erfolgreichen Abschluss.</p>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/80 backdrop-blur-md border-t border-outline-variant flex justify-around items-center h-20 px-2 pb-safe w-full shadow-sm">
+<!-- Files -> Absenzen (Active) -->
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-4 py-1 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="history" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="font-label-sm text-label-sm">Absenzen</span>
+</a>
+<!-- Timetable -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-sm text-label-sm">Timetable</span>
+</a>
+<!-- Grades -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="grade">grade</span>
+<span class="font-label-sm text-label-sm">Grades</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+</body></html>
