@@ -1,5 +1,5 @@
 use crate::AppState;
-use crate::handlers::auth::{login, register, refresh};
+use crate::handlers::auth::{login, refresh, register};
 use axum::{Router, routing::post};
 
 pub fn router() -> Router<AppState> {

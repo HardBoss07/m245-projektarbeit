@@ -1,15 +1,10 @@
 use crate::AppState;
 use crate::errors::AppError;
+use crate::models::Role;
+use crate::models::auth::{RefreshToken, UserAuth};
 use crate::services::auth::{create_refresh_token, create_token};
 use crate::services::hash::verify_password;
-use crate::models::auth::{RefreshToken, UserAuth};
-use crate::models::Role;
-use axum::{
-    extract::State,
-    http::StatusCode,
-    response::IntoResponse,
-    Json,
-};
+use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use axum_extra::extract::CookieJar;
 use axum_extra::extract::cookie::{Cookie, SameSite};
 use chrono::{Duration, Utc};
@@ -50,7 +45,11 @@ pub async fn login(
         return Err(AppError::Unauthorized);
     }
 
-    let token = create_token(user.id, &user.role_name.unwrap_or_default(), &state.jwt_secret)?;
+    let token = create_token(
+        user.id,
+        &user.role_name.unwrap_or_default(),
+        &state.jwt_secret,
+    )?;
     let refresh_token = create_refresh_token();
     let family_id = Uuid::new_v4();
     let expires_at = Utc::now() + Duration::days(7);
@@ -170,7 +169,12 @@ pub async fn refresh(
         .expires(Some(std::time::SystemTime::from(expires_at).into()))
         .build();
 
-    Ok((jar.add(cookie), Json(AuthResponse { token: new_access_token })))
+    Ok((
+        jar.add(cookie),
+        Json(AuthResponse {
+            token: new_access_token,
+        }),
+    ))
 }
 
 #[derive(Deserialize)]
