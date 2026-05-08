@@ -10,7 +10,7 @@ use sqlx::postgres::PgPoolOptions;
 use std::net::SocketAddr;
 use std::time::Duration;
 use tower_http::compression::CompressionLayer;
-use tower_http::cors::{Any, CorsLayer};
+use tower_http::cors::CorsLayer;
 use tower_http::timeout::TimeoutLayer;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -18,6 +18,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 #[derive(Clone)]
 pub struct AppState {
     pub db: sqlx::PgPool,
+    pub jwt_secret: String,
 }
 
 #[tokio::main]
@@ -34,6 +35,8 @@ async fn main() {
         .init();
 
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let jwt_secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let frontend_url = std::env::var("FRONTEND_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
 
     let pool = PgPoolOptions::new()
         .max_connections(5)
@@ -42,13 +45,25 @@ async fn main() {
         .await
         .expect("Failed to create pool");
 
-    let state = AppState { db: pool };
+    let state = AppState {
+        db: pool,
+        jwt_secret,
+    };
 
     // CORS configuration
     let cors = CorsLayer::new()
-        .allow_origin(Any) // In production, replace with specific origin
-        .allow_methods(Any)
-        .allow_headers(Any);
+        .allow_origin(frontend_url.parse::<axum::http::HeaderValue>().unwrap())
+        .allow_methods([
+            axum::http::Method::GET,
+            axum::http::Method::POST,
+            axum::http::Method::PATCH,
+            axum::http::Method::DELETE,
+        ])
+        .allow_headers([
+            axum::http::header::AUTHORIZATION,
+            axum::http::header::CONTENT_TYPE,
+        ])
+        .allow_credentials(true);
 
     // Build our application with routes
     let app = Router::new()
