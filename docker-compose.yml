@@ -13,7 +13,44 @@ services:
       - /app/.next
     networks:
       - wiss-network
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgres://postgres:password@db:5432/wiss_tocco
+      - RUST_LOG=debug
+    volumes:
+      - ./backend:/app
+      - /app/target
+    networks:
+      - wiss-network
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=wiss_tocco
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - wiss-network
 
 networks:
   wiss-network:
     driver: bridge
+
+volumes:
+  db-data:
