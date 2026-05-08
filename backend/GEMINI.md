@@ -76,14 +76,16 @@ pub enum AppError {
 
 ### Phase 1: Authentication & Security (Priority: High)
 
-- [ ] **JWT Foundation**: Implement `AuthService` with `jsonwebtoken` for token signing and validation.
-- [ ] **Refresh Token Logic**:
-  - [ ] Create a `refresh_tokens` table in PostgreSQL to store hashes and family IDs.
-  - [ ] Implement `POST /api/v1/auth/refresh` with **Token Rotation** and reuse detection.
-  - [ ] Secure Cookie handling via `axum-extra::extract::CookieJar`.
-- [ ] **Password Hashing**: Integrate `argon2` for secure user registration and login.
-- [ ] **Auth Middleware**: Create a Tower layer to protect private routes and extract `Claims` into request extensions.
-- [ ] **CORS & Rate Limiting**: Fine-tune `tower-http` layers for production security.
+- [x] **JWT Foundation**: Implement `AuthService` with `jsonwebtoken` for token signing and validation.
+- [x] **Refresh Token Logic & Rotation**:
+- [x] **Storage**: Create a `refresh_tokens` table in PostgreSQL.
+- [x] **Rotation with Grace Periods**: Implement `POST /api/v1/auth/refresh` with rotation and 30s grace period.
+- [x] **Reuse Detection**: Family-based revocation on reuse of rotated tokens.
+- [x] **Secure Cookie handling**: `HttpOnly`, `Secure`, and `SameSite=Strict` refresh token cookies.
+
+- [x] **Password Hashing**: Integrate `argon2` for secure user registration and login.
+- [x] **Auth Middleware**: Create a Tower layer (extractor) to protect private routes and extract `Claims` into request extensions.
+- [x] **CORS & Rate Limiting**: Fine-tune `tower-http` layers for production security.
 
 ### Phase 2: User & Profile Management
 

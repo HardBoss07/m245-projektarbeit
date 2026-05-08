@@ -90,19 +90,20 @@ _Goal: Assemble components into functional pages without a live backend._
 
 _Goal: Prepare the Rust environment._
 
-- [ ] **4.1 Rust Setup**:
-  - [ ] Create `Dockerfile.backend` using `rust-slim:1.92`.
-  - [ ] Scaffold Axum 0.8.8 project with Tokio/Tower.
-- [ ] **4.2 API Skeleton**:
-  - [ ] Define basic health check routes and `/api/auth` stubs.
+- [x] **4.1 Rust Setup**:
+  - [x] Create `Dockerfile.backend` using `rust-slim:1.92`.
+  - [x] Scaffold Axum 0.8.8 project with Tokio/Tower.
+- [x] **4.2 API Skeleton**:
+  - [x] Define basic health check routes and `/api/v1/auth` stubs.
 
 ### Phase 5: State & Session Management
 
 _Goal: Integrate JWT logic._
 
-- [ ] **5.1 JWT Handler**:
-  - [ ] Implement client-side session context in Next.js.
-  - [ ] Configure interceptors to handle token expiration/refresh.
+- [x] **5.1 JWT Handler**:
+  - [x] Implement client-side session context in Next.js.
+  - [x] Configure interceptors to handle token expiration/refresh.
+
 
 ## 5. Development Guidelines
 
