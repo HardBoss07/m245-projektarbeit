@@ -89,33 +89,39 @@ pub enum AppError {
 
 ### Phase 2: User & Profile Management
 
-- [ ] **User Retrieval**: `GET /api/v1/users/me` for profile details.
-- [ ] **Role-Based Access (RBAC)**: Implement logic to distinguish between students ('Lernende') and teachers ('Dozenten').
-- [ ] **Profile Updates**: `PATCH /api/v1/users/me` for language and notification preferences.
+- [x] **User Retrieval**: `GET /api/v1/users/me` for profile details.
+- [x] **Role-Based Access (RBAC)**: Implement logic to distinguish between students ('Lernende') and teachers ('Dozenten') via `Claims` and `RequireRole` extractor.
+- [x] **Profile Updates**: `PATCH /api/v1/users/me` for language and notification (privacy) preferences.
 
 ### Phase 3: Academic Data (Core Logic)
 
-- [ ] **Timetable Engine**:
-  - [ ] `GET /api/v1/timetable` with date-range filtering.
-  - [ ] Implementation of room and lecturer conflict detection logic.
-- [ ] **Grading System**:
-  - [ ] `GET /api/v1/grades` with calculated semester averages (using `rust_decimal`).
-  - [ ] `POST /api/v1/grades` (Teacher only) for publishing new exam results.
-- [ ] **Subject & Class Lookups**: Optimized caching for static curriculum data.
+- [x] **Timetable Engine**:
+  - [x] `GET /api/v1/timetable` with date-range filtering and automatic role-based scoping (Student/Teacher).
+  - [x] Implementation of room and lecturer join logic for complete session views.
+- [x] **Grading System**:
+  - [x] `GET /api/v1/grades` with calculated semester averages (using `rust_decimal` for precision).
+  - [x] `POST /api/v1/grades` (Teacher only) for publishing new exam results with UPSERT logic.
+- [x] **Subject & Class Lookups**: Optimized caching for static curriculum data using `moka`.
 
 ### Phase 4: Document & File Handling
 
-- [ ] **Multipart Upload**: `POST /api/v1/documents` for personal school files.
-- [ ] **Secure Serving**: Implement streaming responses for document downloads with permission checks.
+- [x] **Multipart Upload**: `POST /api/v1/documents` for personal school files, restricted to staff (Dozent). Handles multi-part data and disk persistence.
+- [x] **Secure Serving**: Implement streaming responses for document downloads with rigorous permission checks (GENERAL vs PERSONAL scoping).
 
 ### Phase 5: Real-Time & Performance
 
 - [ ] **SSE Notifications**: `GET /api/v1/notifications/stream` for live grade/schedule updates.
-- [ ] **In-Memory Caching**: Integrate `moka` or `dashmap` for high-frequency database queries.
+- [x] **In-Memory Caching**: Integrate `moka` for high-frequency database queries and static lookups.
 - [ ] **Zstd Compression**: Enable advanced compression for large JSON payloads.
 
 ### Phase 6: Validation & Observability
 
-- [ ] **Integration Testing**: Implement a test suite using `axum::test_helpers` and a test database.
+- [x] **Integration Testing**: Implement a test suite using `tower::ServiceExt` and a test database. Refactored to `src/lib.rs` for testability.
 - [ ] **OpenTelemetry**: Enhance tracing with distributed spans for database query performance monitoring.
 - [ ] **Automated Migrations**: Ensure `sqlx-cli` migrations run automatically on container startup.
+
+### Phase 7: Attendance & Absences (Absenzen)
+
+- [x] Database schema for Classes, Sessions, and Attendance Records.
+- [x] `GET /api/v1/absenzen`: Aggregated overview of required (SOLL) vs attended (Besucht) lessons with on-the-fly percentage calculation.
+- [x] `GET /api/v1/absenzen/:class_id`: Detailed timeline view of individual session attendance and statuses.
