@@ -1,0 +1,50 @@
+### Schema Documentation
+
+- **roles**: (Lookup table for user types)
+  - role name (e.g., Lernende, Dozent)
+- **users (login & profile)**:
+  - mail (demo) / OpenID (real app)
+  - password hash
+  - first name
+  - last name
+  - gender
+  - birth date
+  - language
+  - publish details (boolean)
+  - role reference (MKT-Funktion)
+- **classes**:
+  - class designation (e.g., IFZK-2524-017)
+- **class_enrollments**: (Junction table linking students to classes)
+  - user reference
+  - class reference
+- **rooms**:
+  - room name (e.g., ZH 208, ZH 404)
+- **subjects**: (High-level curriculum definition)
+  - subject code (e.g., GB-ZH-IFZK-M-B21-03-IK-GE-231)
+  - subject name (e.g., Datenschutz und Datensicherheit anwenden)
+- **events / courses**: (Specific instance of a subject for a class)
+  - event shortcut (e.g., 32325 / IFZK...)
+  - subject reference
+  - class reference
+- **timetable_sessions**:
+  - event reference
+  - room reference
+  - lecturer reference (points to users table)
+  - start time (Von)
+  - end time (Bis)
+  - remarks
+- **documents**:
+  - filename / designation
+  - file path / URI
+  - document type (ENUM: GENERAL, PERSONAL)
+  - target user reference (NULL if general, populated if personal)
+  - modified by reference (who uploaded it)
+  - modified at (datetime)
+- **exams**: (The definition of the test)
+  - event reference
+  - description (e.g., ZP, LB)
+  - weight percentage (e.g., 70.00, 15.00, 15.00)
+- **exam_results**: (The actual grade the student achieved)
+  - exam reference
+  - student reference (points to users)
+  - grade value (e.g., 5.100)
