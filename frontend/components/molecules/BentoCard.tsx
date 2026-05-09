@@ -1,40 +1,39 @@
-import React from "react";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { Card } from '@/components/atoms/Card';
+import { Typography } from '@/components/atoms/Typography';
+import { Icon } from '@/components/atoms/Icon';
 
 interface BentoCardProps {
+  title: string;
+  icon?: string;
   children: React.ReactNode;
+  footer?: React.ReactNode;
   className?: string;
-  variant?: "elevated" | "flat" | "high-priority";
-  padding?: "md" | "lg";
 }
 
-export function BentoCard({
+export const BentoCard: React.FC<BentoCardProps> = ({
+  title,
+  icon,
   children,
-  className,
-  variant = "flat",
-  padding = "md",
-}: BentoCardProps) {
-  const variants = {
-    elevated: "bg-surface-container-lowest shadow-soft border border-outline-variant",
-    flat: "bg-surface-container-lowest border border-outline-variant",
-    "high-priority": "bg-primary text-on-primary shadow-raised",
-  };
-
-  const paddings = {
-    md: "p-4", // 16px
-    lg: "p-5", // 20px
-  };
-
+  footer,
+  className = '',
+}) => {
   return (
-    <div
-      className={cn(
-        "rounded-xl transition-all", // xl = 1rem = 16px
-        variants[variant],
-        paddings[padding],
-        className
+    <Card variant="elevated" className={`flex flex-col gap-sm p-md h-full ${className}`}>
+      <div className="flex items-center justify-between mb-1">
+        <Typography variant="label-sm" className="text-on-surface-variant font-bold">
+          {title}
+        </Typography>
+        {icon && <Icon name={icon} className="text-accent text-[20px]" />}
+      </div>
+      <div className="flex-1">
+        {children}
+      </div>
+      {footer && (
+        <div className="pt-sm mt-sm border-t border-outline-variant">
+          {footer}
+        </div>
       )}
-    >
-      {children}
-    </div>
+    </Card>
   );
-}
+};

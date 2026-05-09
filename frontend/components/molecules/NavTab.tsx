@@ -1,29 +1,37 @@
-import React from "react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import Link from 'next/link';
+import { Icon } from '@/components/atoms/Icon';
+import { Typography } from '@/components/atoms/Typography';
 
 interface NavTabProps {
   href: string;
-  icon: React.ReactNode;
+  icon: string;
   label: string;
   isActive?: boolean;
 }
 
-export function NavTab({ href, icon, label, isActive }: NavTabProps) {
+export const NavTab: React.FC<NavTabProps> = ({ href, icon, label, isActive = false }) => {
   return (
-    <Link
-      href={href}
-      className={cn(
-        "flex flex-col items-center justify-center px-4 py-1 transition-all active:scale-90 duration-200",
-        isActive
-          ? "bg-secondary-container text-on-secondary-container rounded-xl"
-          : "text-on-surface-variant hover:text-primary"
-      )}
+    <Link 
+      href={href} 
+      className={`relative flex flex-col items-center justify-center w-full h-full transition-all duration-200 active:scale-90
+                 ${isActive ? 'text-accent' : 'text-on-surface-variant'}`}
     >
-      <div className={cn("mb-1", isActive && "[&>svg]:fill-current")}>
-        {icon}
-      </div>
-      <span className="text-label-sm">{label}</span>
+      <Icon 
+        name={icon} 
+        fill={isActive} 
+        className={`text-[24px] mb-1 transition-transform ${isActive ? 'scale-110' : ''}`} 
+      />
+      <Typography 
+        variant="label-sm" 
+        className={`font-bold !tracking-tight text-center leading-none
+                   ${isActive ? 'text-accent' : 'text-on-surface-variant'}`}
+      >
+        {label}
+      </Typography>
+      {isActive && (
+        <div className="absolute bottom-1.5 w-1 h-1 rounded-full bg-accent" />
+      )}
     </Link>
   );
-}
+};

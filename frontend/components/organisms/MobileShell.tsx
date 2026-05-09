@@ -1,20 +1,27 @@
-import React from "react";
-import { Header } from "./Header";
-import { BottomNav } from "@/components/molecules/BottomNav";
+import React from 'react';
+import { Header } from './Header';
+import { BottomNav } from './BottomNav';
 
 interface MobileShellProps {
   children: React.ReactNode;
-  showNav?: boolean;
+  title: string;
+  subtitle?: string;
+  showBack?: boolean;
 }
 
-export function MobileShell({ children, showNav = true }: MobileShellProps) {
+export const MobileShell: React.FC<MobileShellProps> = ({
+  children,
+  title,
+  subtitle,
+  showBack,
+}) => {
   return (
-    <div className="flex min-h-screen flex-col bg-background pb-32">
-      <Header />
-      <main className="flex-1 px-5 pt-6">
-        <div className="mx-auto max-w-md w-full">{children}</div>
+    <div className="flex flex-col min-h-screen bg-surface">
+      <Header title={title} subtitle={subtitle} showBack={showBack} />
+      <main className="flex-1 pb-[92px]">
+        {children}
       </main>
-      {showNav && <BottomNav />}
+      <BottomNav />
     </div>
   );
-}
+};

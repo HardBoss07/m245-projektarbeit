@@ -1,60 +1,48 @@
-import React from "react";
-import { ChevronRight } from "lucide-react";
-import { BentoCard } from "@/components/molecules/BentoCard";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { Typography } from '@/components/atoms/Typography';
+import { Icon } from '@/components/atoms/Icon';
 
 interface ListEntryProps {
-  icon: React.ReactNode;
-  iconBgColor?: string;
   title: string;
-  subtitle: string;
-  rightElement?: React.ReactNode;
+  subtitle?: string;
+  value?: string;
+  icon?: string;
   onClick?: () => void;
   className?: string;
 }
 
-export function ListEntry({
-  icon,
-  iconBgColor = "bg-primary-container",
+export const ListEntry: React.FC<ListEntryProps> = ({
   title,
   subtitle,
-  rightElement,
+  value,
+  icon,
   onClick,
-  className,
-}: ListEntryProps) {
+  className = '',
+}) => {
   return (
-    <BentoCard
-      variant="elevated"
-      padding="md"
-      className={cn(
-        "flex items-center justify-between hover:bg-surface-container-low transition-colors group cursor-pointer",
-        className
-      )}
+    <div 
       onClick={onClick}
+      className={`flex items-center gap-md p-md bg-white border-b border-outline-variant last:border-0 
+                 active:bg-surface-container transition-colors ${onClick ? 'cursor-pointer' : ''} ${className}`}
     >
-      <div className="flex items-center gap-4">
-        <div
-          className={cn(
-            "w-12 h-12 rounded-lg flex items-center justify-center shrink-0",
-            iconBgColor
-          )}
-        >
-          {icon}
+      {icon && (
+        <div className="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary-container">
+          <Icon name={icon} />
         </div>
-        <div>
-          <p className="text-body-lg font-semibold text-on-surface line-clamp-1">
-            {title}
-          </p>
-          <p className="text-label-sm text-on-surface-variant line-clamp-1">
+      )}
+      <div className="flex-1 flex flex-col">
+        <Typography variant="body-md" className="font-semibold">{title}</Typography>
+        {subtitle && (
+          <Typography variant="label-sm" className="text-on-surface-variant leading-none mt-1">
             {subtitle}
-          </p>
-        </div>
-      </div>
-      <div className="flex items-center gap-2">
-        {rightElement || (
-          <ChevronRight className="text-outline group-hover:text-primary transition-colors" />
+          </Typography>
         )}
       </div>
-    </BentoCard>
+      {value && (
+        <Typography variant="body-md" className="font-bold text-accent">
+          {value}
+        </Typography>
+      )}
+    </div>
   );
-}
+};
