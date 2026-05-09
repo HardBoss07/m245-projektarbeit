@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
-import { Lexend } from "next/font/google";
+import lexend from "@/styles/fonts";
 import "./globals.css";
 
-const lexend = Lexend({
-  variable: "--font-lexend",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "WISS Tocco",
-  description: "Modernized school portal for WISS students",
+  title: "Wiss Tocco Redesign",
+  description: "Academic Excellence and Digital Fluidity",
 };
 
 export default function RootLayout({
@@ -18,11 +13,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${lexend.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="de" className={`${lexend.variable}`}>
+      <head>
+        <link 
+          rel="stylesheet" 
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" 
+        />
+      </head>
+      <body>
+        {children}
+      </body>
     </html>
   );
 }

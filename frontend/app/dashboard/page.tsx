@@ -1,101 +1,90 @@
-"use client";
-
-import React from "react";
-import { MobileShell } from "@/components/organisms/MobileShell";
-import { BentoCard } from "@/components/molecules/BentoCard";
-import { GraduationCap, Calendar, Clock, TrendingUp, Loader2 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { MobileShell } from '@/components/organisms/MobileShell';
+import { BentoCard } from '@/components/molecules/BentoCard';
+import { Typography } from '@/components/atoms/Typography';
+import { ListEntry } from '@/components/molecules/ListEntry';
+import { Card } from '@/components/atoms/Card';
+import { MOCK_SUBJECTS } from '@/lib/mock-data';
+import Link from 'next/link';
 
 export default function DashboardPage() {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-surface">
-        <Loader2 className="animate-spin text-primary" size={48} />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) return null;
+  const latestGradesSubject = MOCK_SUBJECTS[0];
 
   return (
-    <MobileShell>
-      <div className="space-y-6">
-        <header>
-          <h2 className="text-h1">Dashboard</h2>
-          <p className="text-body-md text-on-surface-variant">Welcome back, Max!</p>
-        </header>
+    <MobileShell title="Dashboard" subtitle="Willkommen zurück, Matteo">
+      <div className="p-margin flex flex-col gap-lg">
+        {/* Next Lesson Bento */}
+        <Link href="/schedule">
+          <BentoCard 
+            title="NÄCHSTE LEKTION" 
+            icon="schedule"
+            footer={
+              <Typography variant="label-sm" className="text-accent font-bold">
+                In 15 Minuten • Raum 302
+              </Typography>
+            }
+          >
+            <Typography variant="h2">Applikations-Sicherheit</Typography>
+            <Typography variant="body-md" className="text-on-surface-variant">
+              Modul 245 • Informatik
+            </Typography>
+          </BentoCard>
+        </Link>
 
-        {/* Quick Stats Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          <BentoCard variant="elevated" className="flex flex-col gap-2">
-            <GraduationCap className="text-primary" size={24} />
-            <div>
-              <p className="text-h2">5.4</p>
-              <p className="text-label-sm text-on-surface-variant">Current GPA</p>
-            </div>
-          </BentoCard>
-          <BentoCard variant="elevated" className="flex flex-col gap-2">
-            <TrendingUp className="text-primary" size={24} />
-            <div>
-              <p className="text-h2">Top 5%</p>
-              <p className="text-label-sm text-on-surface-variant">Class Rank</p>
-            </div>
-          </BentoCard>
+        {/* Stats Row */}
+        <div className="grid grid-cols-2 gap-md">
+          <Link href="/grades">
+            <BentoCard title="SCHNITT">
+              <Typography variant="display" className="text-accent">5.2</Typography>
+              <Typography variant="label-sm" className="text-on-surface-variant font-bold">
+                Aktuelles Semester
+              </Typography>
+            </BentoCard>
+          </Link>
+          <Link href="/absences">
+            <BentoCard title="ABSENZEN">
+              <Typography variant="display" className="text-error">2</Typography>
+              <Typography variant="label-sm" className="text-on-surface-variant font-bold">
+                Offene Einträge
+              </Typography>
+            </BentoCard>
+          </Link>
         </div>
 
-        {/* Upcoming Class */}
-        <BentoCard variant="high-priority" padding="lg">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-label-sm font-bold bg-white/20 px-2 py-0.5 rounded-full uppercase tracking-wider">Now</span>
-            <span className="text-label-sm opacity-80">Room 302</span>
+        {/* Recent Activity */}
+        <section className="flex flex-col gap-sm">
+          <div className="flex items-center justify-between ml-1">
+            <Typography variant="label-sm" className="text-on-surface-variant font-bold">
+              LETZTE NOTEN
+            </Typography>
+            <Link href="/grades">
+              <Typography variant="label-sm" className="text-accent font-bold">ALLE ANZEIGEN</Typography>
+            </Link>
           </div>
-          <h3 className="text-h2 mb-1">Software Engineering</h3>
-          <p className="text-body-md opacity-80 mb-4">Dr. Adrian Müller</p>
-          <div className="flex items-center gap-2 text-label-sm">
-            <Clock size={16} />
-            <span>08:30 - 10:00</span>
-          </div>
-        </BentoCard>
-
-        {/* Recent Activity Section */}
-        <section className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-h2">Recent Grades</h3>
-            <button className="text-accent-cyan text-label-sm font-bold">View All</button>
-          </div>
-          <div className="space-y-3">
-            {[
-              { subject: "Informatik", grade: "5.8", date: "2 days ago" },
-              { subject: "Mathematik", grade: "4.9", date: "Yesterday" },
-            ].map((item, i) => (
-              <BentoCard key={i} className="flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
-                    <GraduationCap size={20} className="text-on-surface-variant" />
-                  </div>
-                  <div>
-                    <p className="text-body-md font-semibold">{item.subject}</p>
-                    <p className="text-label-sm text-on-surface-variant">{item.date}</p>
-                  </div>
-                </div>
-                <span className="text-h2 text-primary">{item.grade}</span>
-              </BentoCard>
+          <Card className="!p-0 overflow-hidden">
+            {latestGradesSubject.grades.slice(0, 2).map(grade => (
+              <Link key={grade.id} href={`/grades/${latestGradesSubject.id}`}>
+                <ListEntry 
+                  title={grade.title} 
+                  subtitle={`${latestGradesSubject.name} • ${grade.date}`} 
+                  value={grade.value.toFixed(1)} 
+                  icon="grade"
+                />
+              </Link>
             ))}
-          </div>
+          </Card>
         </section>
 
-        {/* Schedule Preview */}
-        <section className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-h2">Next Up</h3>
-            <Calendar className="text-on-surface-variant" size={20} />
+        {/* Illustration Card (as seen in designs) */}
+        <section className="rounded-xl overflow-hidden h-40 relative group shadow-md">
+          <img 
+            className="w-full h-full object-cover grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-75 transition-all duration-700" 
+            src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80"
+            alt="Library"
+          />
+          <div className="absolute inset-0 flex flex-col justify-end p-md bg-gradient-to-t from-black/80 to-transparent">
+            <Typography variant="h2" className="text-white">Präsenz ist der Schlüssel</Typography>
+            <Typography variant="body-md" className="text-white/70">Behalte deine Fehlzeiten im Griff für einen Erfolg.</Typography>
           </div>
-          <BentoCard variant="flat" className="flex flex-col gap-1">
-            <p className="text-body-md font-semibold">Database Management</p>
-            <p className="text-label-sm text-on-surface-variant">10:15 - 11:45 • Lab 12</p>
-          </BentoCard>
         </section>
       </div>
     </MobileShell>

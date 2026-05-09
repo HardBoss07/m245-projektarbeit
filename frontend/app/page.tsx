@@ -1,152 +1,108 @@
 "use client";
 
-import React, { useState } from "react";
-import { School, Info, Mail, Lock, Loader2 } from "lucide-react";
-import { Button } from "@/components/atoms/Button";
-import { Input } from "@/components/atoms/Input";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import React, { useState } from 'react';
+import { Typography } from '@/components/atoms/Typography';
+import { Input } from '@/components/atoms/Input';
+import { Button } from '@/components/atoms/Button';
+import { Icon } from '@/components/atoms/Icon';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch("http://localhost:3001/api/v1/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Invalid credentials");
-      }
-
-      const data = await response.json();
-      localStorage.setItem("token", data.token);
-      router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Failed to log in");
-    } finally {
+    // Simulate API call
+    setTimeout(() => {
       setIsLoading(false);
-    }
+      router.push('/dashboard');
+    }, 1000);
+  };
+
+  const handleBypass = () => {
+    router.push('/dashboard');
   };
 
   return (
-    <div className="bg-surface text-on-surface flex flex-col min-h-screen">
-      <header className="bg-surface border-b border-outline-variant flex items-center justify-between px-5 h-16 w-full fixed top-0 z-50">
-        <div className="flex items-center gap-2">
-          <School className="text-primary" size={24} />
-          <h1 className="text-display text-primary tracking-tight">WISS Tocco</h1>
-        </div>
-        <div className="hidden md:flex gap-6 items-center">
-          <nav className="flex gap-4">
-            <span className="text-label-sm text-on-surface-variant hover:bg-surface-container-high transition-colors px-3 py-2 rounded-lg cursor-pointer">Support</span>
-            <span className="text-label-sm text-on-surface-variant hover:bg-surface-container-high transition-colors px-3 py-2 rounded-lg cursor-pointer">Help</span>
-          </nav>
-        </div>
-      </header>
-
-      <main className="flex-grow flex items-center justify-center pt-16 px-5">
-        <div className="w-full max-w-sm flex flex-col gap-8">
-          {/* Branding & Visual Anchor */}
-          <div className="flex flex-col items-center text-center gap-6">
-            <div className="w-24 h-24 rounded-full bg-surface-container-high flex items-center justify-center mb-2 shadow-soft">
-              <School className="text-primary" size={48} />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-h1 text-on-surface">Welcome Back</h2>
-              <p className="text-body-md text-on-surface-variant">Sign in to your school account to access your digital campus.</p>
-            </div>
+    <main className="min-h-screen bg-surface flex flex-col justify-center items-center px-6 py-12">
+      <div className="w-full max-w-[400px] flex flex-col gap-10">
+        {/* Logo/Brand */}
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-20 h-20 bg-primary-container rounded-2xl flex items-center justify-center text-white shadow-xl">
+            <Icon name="school" className="text-4xl" />
           </div>
-
-          {/* Login Card */}
-          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-soft">
-            <div className="flex flex-col gap-6">
-              {/* Microsoft Primary Action */}
-              <Button variant="secondary" size="lg" fullWidth className="gap-4">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 23 23">
-                  <path d="M1 1h10v10H1z" fill="#f35325"></path>
-                  <path d="M12 1h10v10H12z" fill="#81bc06"></path>
-                  <path d="M1 12h10v10H1z" fill="#05a6f0"></path>
-                  <path d="M12 12h10v10H12z" fill="#ffba08"></path>
-                </svg>
-                Log in with Microsoft
-              </Button>
-
-              <div className="relative flex items-center">
-                <div className="flex-grow border-t border-outline-variant"></div>
-                <span className="flex-shrink mx-4 text-on-surface-variant text-label-sm uppercase tracking-wider">School Authentication</span>
-                <div className="flex-grow border-t border-outline-variant"></div>
-              </div>
-
-              {/* Login Form */}
-              <form onSubmit={handleLogin} className="flex flex-col gap-4">
-                <div className="space-y-2">
-                  <Input
-                    type="email"
-                    placeholder="Email"
-                    icon={<Mail size={18} />}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <Input
-                    type="password"
-                    placeholder="Password"
-                    icon={<Lock size={18} />}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-
-                {error && (
-                  <p className="text-label-sm text-error bg-error/10 p-3 rounded-lg border border-error/20">
-                    {error}
-                  </p>
-                )}
-
-                <Button 
-                  type="submit" 
-                  variant="primary" 
-                  size="lg" 
-                  fullWidth 
-                  disabled={isLoading}
-                >
-                  {isLoading ? <Loader2 className="animate-spin" /> : "Sign In"}
-                </Button>
-              </form>
-
-              {/* Information Subtext */}
-              <div className="flex gap-4 p-4 bg-surface-container-low rounded-lg border border-outline-variant/30">
-                <Info className="text-on-surface-variant shrink-0" size={20} />
-                <p className="text-body-md text-on-surface-variant">
-                  This login is required for secure access to Files, Timetables, and Grades. Your credentials are managed by your institution.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer / Support Links */}
-          <div className="flex flex-col gap-4 text-center">
-            <p className="text-label-sm text-on-surface-variant">
-              Having trouble signing in? <br/>
-              <a className="text-primary font-bold hover:underline" href="#">Contact IT Support</a>
-            </p>
+          <div className="text-center">
+            <Typography variant="display" className="tracking-tighter">WISS TOCCO</Typography>
+            <Typography variant="body-md" className="text-on-surface-variant">
+              Academic Excellence & Clarity
+            </Typography>
           </div>
         </div>
-      </main>
-    </div>
+
+        {/* Form */}
+        <form onSubmit={handleLogin} className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-outline-variant shadow-md w-full">
+          <div className="flex flex-col gap-5 w-full">
+            <Input 
+              label="Studenten E-Mail" 
+              placeholder="vorname.nachname@wiss.ch" 
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <Input 
+              label="Passwort" 
+              placeholder="••••••••" 
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" className="w-4 h-4 rounded border-outline-variant text-accent focus:ring-accent" />
+              <Typography variant="label-sm">Angemeldet bleiben</Typography>
+            </label>
+            <Typography variant="label-sm" className="text-accent font-bold cursor-pointer hover:underline">
+              Passwort vergessen?
+            </Typography>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Button 
+              type="submit" 
+              fullWidth 
+              disabled={isLoading}
+            >
+              {isLoading ? 'Anmelden...' : 'Login'}
+            </Button>
+            
+            <Button 
+              type="button"
+              variant="ghost"
+              fullWidth
+              onClick={handleBypass}
+              className="border-accent text-accent hover:bg-accent/5"
+            >
+              Dev Bypass (No Login)
+            </Button>
+          </div>
+        </form>
+
+        {/* Footer */}
+        <div className="text-center">
+          <Typography variant="label-sm" className="text-on-surface-variant">
+            Probleme beim Login? <br/>
+            <span className="text-accent font-bold cursor-pointer">Support kontaktieren</span>
+          </Typography>
+        </div>
+      </div>
+    </main>
   );
 }
