@@ -1,12 +1,12 @@
 use crate::AppState;
-use crate::handlers::grades::{get_my_grades, publish_grade};
+use crate::handlers::grades::{get_grades, update_grade};
 use axum::{
     Router,
-    routing::{get, post},
+    routing::{get, patch},
 };
 
 pub fn router() -> Router<AppState> {
     Router::new()
-        .route("/", get(get_my_grades))
-        .route("/", post(publish_grade))
+        .route("/", get(get_grades))
+        .route("/:id", patch(update_grade))
 }

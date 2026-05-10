@@ -7,6 +7,7 @@ use axum::{
     response::IntoResponse,
 };
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Debug, Deserialize)]
 pub struct UpdateUserPayload {
@@ -15,8 +16,9 @@ pub struct UpdateUserPayload {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UserResponse {
-    pub id: uuid::Uuid,
+    pub id: Uuid,
     pub email: String,
     pub first_name: String,
     pub last_name: String,
@@ -28,11 +30,11 @@ pub struct UserResponse {
 impl From<User> for UserResponse {
     fn from(user: User) -> Self {
         Self {
-            id: user.id,
+            id: user.id.0,
             email: user.email,
             first_name: user.first_name,
             last_name: user.last_name,
-            role_name: None, // We'll populate this if needed
+            role_name: None,
             language: user.language.unwrap_or_else(|| "de".to_string()),
             publish_details: user.publish_details.unwrap_or(false),
         }
@@ -48,7 +50,20 @@ pub async fn get_me(
     let user = sqlx::query_as!(
         User,
         r#"
-        SELECT * FROM users WHERE id = $1
+        SELECT 
+            id as "id: _", 
+            role_id as "role_id: _", 
+            email, 
+            password_hash, 
+            first_name, 
+            last_name, 
+            gender, 
+            birth_date, 
+            language, 
+            publish_details, 
+            created_at
+        FROM users 
+        WHERE id = $1
         "#,
         claims.sub
     )
@@ -56,9 +71,8 @@ pub async fn get_me(
     .await?
     .ok_or_else(|| AppError::NotFound("User not found".to_string()))?;
 
-    // Also get the role name
     let role_name = if let Some(role_id) = user.role_id {
-        sqlx::query!("SELECT name FROM roles WHERE id = $1", role_id)
+        sqlx::query!("SELECT name FROM roles WHERE id = $1", role_id as _)
             .fetch_optional(&state.db)
             .await?
             .map(|r| r.name)
@@ -69,7 +83,7 @@ pub async fn get_me(
     let mut response: UserResponse = user.into();
     response.role_name = role_name;
 
-    Ok(Json(response))
+    Ok(axum::Json(response))
 }
 
 /// PATCH /api/v1/users/me
@@ -87,7 +101,18 @@ pub async fn update_me(
             language = COALESCE($1, language),
             publish_details = COALESCE($2, publish_details)
         WHERE id = $3
-        RETURNING *
+        RETURNING 
+            id as "id: _", 
+            role_id as "role_id: _", 
+            email, 
+            password_hash, 
+            first_name, 
+            last_name, 
+            gender, 
+            birth_date, 
+            language, 
+            publish_details, 
+            created_at
         "#,
         payload.language,
         payload.publish_details,
@@ -99,9 +124,8 @@ pub async fn update_me(
 
     let mut response: UserResponse = user.clone().into();
 
-    // Fetch role name for complete response
     let role_name = if let Some(role_id) = user.role_id {
-        sqlx::query!("SELECT name FROM roles WHERE id = $1", role_id)
+        sqlx::query!("SELECT name FROM roles WHERE id = $1", role_id as _)
             .fetch_optional(&state.db)
             .await?
             .map(|r| r.name)
@@ -110,5 +134,5 @@ pub async fn update_me(
     };
     response.role_name = role_name;
 
-    Ok(Json(response))
+    Ok(axum::Json(response))
 }

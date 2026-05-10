@@ -11,6 +11,12 @@ pub struct Claims {
     pub iat: i64,
     pub role: String,
 }
+
+impl Claims {
+    pub fn is_teacher(&self) -> bool {
+        self.role == "Dozent"
+    }
+}
 pub fn create_token(user_id: Uuid, role: &str, secret: &str) -> Result<String, AppError> {
     let expiration = Utc::now()
         .checked_add_signed(Duration::minutes(15))

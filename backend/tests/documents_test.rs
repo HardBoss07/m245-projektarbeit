@@ -4,8 +4,7 @@ use axum::{
 };
 use http_body_util::BodyExt;
 use moka::future::Cache;
-use serde_json::{Value, json};
-use std::time::Duration;
+use serde_json::Value;
 use tower::ServiceExt;
 use uuid::Uuid;
 use wiss_tocco_backend::services::auth::create_token;
@@ -136,7 +135,7 @@ async fn test_multipart_upload_rbac() {
     let jwt_secret = "test-secret";
 
     let student_id = Uuid::new_v4();
-    let teacher_id = Uuid::new_v4();
+    let _teacher_id = Uuid::new_v4();
 
     let cache = Cache::builder().build();
     let state = AppState {

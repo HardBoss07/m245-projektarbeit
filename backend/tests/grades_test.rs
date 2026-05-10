@@ -4,9 +4,7 @@ use axum::{
 };
 use http_body_util::BodyExt;
 use moka::future::Cache;
-use rust_decimal::Decimal;
 use serde_json::{Value, json};
-use std::time::Duration;
 use tower::ServiceExt;
 use uuid::Uuid;
 use wiss_tocco_backend::services::auth::create_token;
@@ -104,7 +102,7 @@ async fn test_grades_and_averages() {
     let app = create_app(state).await;
     let token = create_token(student_id, "Lernende", jwt_secret).unwrap();
 
-    /// Scenario: Student requests grades. Average should be 5.5.
+    // Scenario: Student requests grades. Average should be 5.5.
     let resp = app
         .clone()
         .oneshot(
@@ -154,7 +152,7 @@ async fn test_publish_grade_rbac() {
     };
     let app = create_app(state).await;
 
-    /// Scenario 1: Student tries to publish a grade. Should be Forbidden.
+    // Scenario 1: Student tries to publish a grade. Should be Forbidden.
     let student_token = create_token(student_id, "Lernende", jwt_secret).unwrap();
     let resp = app
         .clone()
@@ -178,7 +176,7 @@ async fn test_publish_grade_rbac() {
         .unwrap();
     assert_eq!(resp.status(), StatusCode::FORBIDDEN);
 
-    /// Scenario 2: Teacher publishes a grade. Should be Created.
+    // Scenario 2: Teacher publishes a grade. Should be Created.
     let teacher_token = create_token(teacher_id, "Dozent", jwt_secret).unwrap();
     let resp = app
         .clone()

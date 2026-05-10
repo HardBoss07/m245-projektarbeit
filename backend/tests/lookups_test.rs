@@ -41,7 +41,7 @@ async fn test_list_rooms_cached() {
 
     let app = create_app(state).await;
 
-    /// Scenario: First request fetches from DB and populates cache.
+    // Scenario: First request fetches from DB and populates cache.
     let response = app
         .clone()
         .oneshot(
@@ -68,7 +68,7 @@ async fn test_list_rooms_cached() {
     let cache_key = "rooms:10:0".to_string();
     assert!(cache.get(&cache_key).await.is_some());
 
-    /// Scenario: Second request should be served from cache (even if we delete from DB)
+    // Scenario: Second request should be served from cache (even if we delete from DB)
     sqlx::query!("DELETE FROM rooms WHERE id = $1", room_id)
         .execute(&pool)
         .await

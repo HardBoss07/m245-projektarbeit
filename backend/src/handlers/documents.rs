@@ -1,8 +1,6 @@
 use crate::AppState;
 use crate::errors::AppError;
-use crate::middleware::auth::check_role;
-use crate::models::pagination::Pagination;
-use crate::models::{Document, DocumentType};
+use crate::models::{Document, DocumentType, Pagination, UserId};
 use crate::services::auth::Claims;
 use axum::body::Body;
 use axum::{
@@ -51,8 +49,8 @@ pub async fn list_documents(
             designation, 
             file_path, 
             document_type as "document_type: DocumentType", 
-            target_user_id, 
-            modified_by, 
+            target_user_id as "target_user_id: _", 
+            modified_by as "modified_by: _", 
             modified_at
         FROM documents
         WHERE document_type = 'GENERAL' OR target_user_id = $1
@@ -77,11 +75,13 @@ pub async fn upload_document(
     claims: Claims,
     mut multipart: Multipart,
 ) -> Result<impl IntoResponse, AppError> {
-    check_role(&claims, "Dozent")?;
+    if !claims.is_teacher() {
+        return Err(AppError::Unauthorized);
+    }
 
     let mut designation = None;
     let mut target_user_id = None;
-    let mut doc_type = DocumentType::General;
+    let mut doc_type = DocumentType::GENERAL;
     let mut file_path = None;
 
     while let Some(field) = multipart
@@ -112,9 +112,9 @@ pub async fn upload_document(
                     .await
                     .map_err(|e| AppError::BadRequest(e.to_string()))?;
                 doc_type = if t == "PERSONAL" {
-                    DocumentType::Personal
+                    DocumentType::PERSONAL
                 } else {
-                    DocumentType::General
+                    DocumentType::GENERAL
                 };
             }
             "file" => {
@@ -177,8 +177,8 @@ pub async fn download_document(
             designation, 
             file_path, 
             document_type as "document_type: DocumentType", 
-            target_user_id, 
-            modified_by, 
+            target_user_id as "target_user_id: _", 
+            modified_by as "modified_by: _", 
             modified_at
         FROM documents 
         WHERE id = $1
@@ -191,9 +191,9 @@ pub async fn download_document(
     let doc = doc_opt.ok_or_else(|| AppError::NotFound("Document not found".to_string()))?;
 
     // Permission check
-    if doc.document_type == DocumentType::Personal
-        && doc.target_user_id != Some(claims.sub)
-        && doc.modified_by != Some(claims.sub)
+    if doc.document_type == DocumentType::PERSONAL
+        && doc.target_user_id != Some(UserId(claims.sub))
+        && doc.modified_by != Some(UserId(claims.sub))
     {
         if claims.role != "Admin" {
             return Err(AppError::Forbidden);

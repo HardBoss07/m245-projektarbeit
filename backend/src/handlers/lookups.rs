@@ -1,12 +1,10 @@
 use crate::AppState;
 use crate::errors::AppError;
-use crate::models::pagination::Pagination;
-use crate::models::{Class, Room, Subject};
+use crate::models::{Class, Pagination, Room, Subject};
 use axum::{
     Json,
     extract::{Query, State},
 };
-use rust_decimal::Decimal;
 use serde_json::json;
 use std::sync::Arc;
 
@@ -23,7 +21,7 @@ pub async fn list_rooms(
 
     let rooms = sqlx::query_as!(
         Room,
-        "SELECT * FROM rooms ORDER BY name LIMIT $1 OFFSET $2",
+        r#"SELECT id as "id: _", name FROM rooms ORDER BY name LIMIT $1 OFFSET $2"#,
         pagination.limit(),
         pagination.offset()
     )
@@ -48,7 +46,7 @@ pub async fn list_subjects(
 
     let subjects = sqlx::query_as!(
         Subject,
-        "SELECT * FROM subjects ORDER BY name LIMIT $1 OFFSET $2",
+        r#"SELECT id as "id: _", code, name FROM subjects ORDER BY name LIMIT $1 OFFSET $2"#,
         pagination.limit(),
         pagination.offset()
     )
@@ -78,12 +76,12 @@ pub async fn list_classes(
         Class,
         r#"
         SELECT 
-            id, 
+            id as "id: _", 
             designation, 
             short_name, 
-            class_type as "class_type: crate::models::absenzen::ClassType", 
+            class_type as "class_type: crate::models::ClassType", 
             description, 
-            min_attendance_pct as "min_attendance_pct: Decimal"
+            min_attendance_pct
         FROM classes 
         ORDER BY designation 
         LIMIT $1 OFFSET $2

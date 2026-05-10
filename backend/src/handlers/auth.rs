@@ -27,7 +27,7 @@ pub async fn login(
     jar: CookieJar,
     Json(payload): Json<LoginRequest>,
 ) -> Result<impl IntoResponse, AppError> {
-    let user = sqlx::query_as::<_, UserAuth>(
+    let user = sqlx::query_as::<_, crate::models::auth::UserAuth>(
         r#"
         SELECT u.id, u.password_hash, r.name as role_name
         FROM users u
@@ -45,11 +45,7 @@ pub async fn login(
         return Err(AppError::Unauthorized);
     }
 
-    let token = create_token(
-        user.id,
-        &user.role_name.unwrap_or_default(),
-        &state.jwt_secret,
-    )?;
+    let token = create_token(user.id, &user.role_name, &state.jwt_secret)?;
     let refresh_token = create_refresh_token();
     let family_id = Uuid::new_v4();
     let expires_at = Utc::now() + Duration::days(7);
@@ -142,7 +138,7 @@ pub async fn refresh(
     // 5. Issue new tokens
     let new_access_token = create_token(
         token_record.user_id,
-        &user_info.role_name.unwrap_or_default(),
+        &user_info.role_name,
         &state.jwt_secret,
     )?;
     let new_refresh_token = create_refresh_token();

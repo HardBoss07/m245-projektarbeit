@@ -1,26 +1,16 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Pagination {
-    pub limit: Option<usize>,
-    pub offset: Option<usize>,
-}
-
-impl Default for Pagination {
-    fn default() -> Self {
-        Self {
-            limit: Some(50),
-            offset: Some(0),
-        }
-    }
+    pub limit: i64,
+    pub offset: i64,
 }
 
 impl Pagination {
     pub fn limit(&self) -> i64 {
-        self.limit.unwrap_or(50) as i64
+        self.limit
     }
-
     pub fn offset(&self) -> i64 {
-        self.offset.unwrap_or(0) as i64
+        self.offset
     }
 }

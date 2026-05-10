@@ -6,7 +6,6 @@ use chrono::{Duration as ChronoDuration, Utc};
 use http_body_util::BodyExt;
 use moka::future::Cache;
 use serde_json::Value;
-use std::time::Duration;
 use tower::ServiceExt;
 use uuid::Uuid;
 use wiss_tocco_backend::services::auth::create_token;
@@ -113,7 +112,7 @@ async fn test_get_timetable_scoping() {
     };
     let app = create_app(state).await;
 
-    /// Scenario 1: Student requests timetable. Should see the session because of enrollment.
+    // Scenario 1: Student requests timetable. Should see the session because of enrollment.
     let student_token = create_token(student_id, "Lernende", jwt_secret).unwrap();
     let resp = app
         .clone()
@@ -131,7 +130,7 @@ async fn test_get_timetable_scoping() {
     let sessions: Value = serde_json::from_slice(&body).unwrap();
     assert_eq!(sessions.as_array().unwrap().len(), 1);
 
-    /// Scenario 2: Teacher requests timetable. Should see the session because they are the lecturer.
+    // Scenario 2: Teacher requests timetable. Should see the session because they are the lecturer.
     let teacher_token = create_token(teacher_id, "Dozent", jwt_secret).unwrap();
     let resp = app
         .clone()
