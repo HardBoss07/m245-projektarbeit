@@ -98,4 +98,16 @@ INSERT INTO documents (id, designation, file_path, document_type, target_user_id
 ('31eebc99-9c0b-4ef8-bb6d-6bb9bd380c03', 'Notenberechnung', '/documents/personal/notenberechnung.pdf', 'PERSONAL', 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a61', 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a63', '2026-03-05 12:11:00+02'),
 ('31eebc99-9c0b-4ef8-bb6d-6bb9bd380c04', 'Daten Grundbildung', '/documents/general/daten_grundbildung.pdf', 'GENERAL', NULL, 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a65', '2025-08-15 15:57:00+02');
 
+-- 12. CLASS SESSIONS (For Attendance)
+INSERT INTO class_sessions (id, class_id, session_date, required_lessons) VALUES 
+('41eebc99-9c0b-4ef8-bb6d-6bb9bd380d01', 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a41', '2026-05-11 13:00:00+02', 4.0),
+('41eebc99-9c0b-4ef8-bb6d-6bb9bd380d02', 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a41', '2026-05-04 13:00:00+02', 4.0),
+('41eebc99-9c0b-4ef8-bb6d-6bb9bd380d03', 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a41', '2026-04-27 13:00:00+02', 4.0);
+
+-- 13. ATTENDANCE RECORDS (For Matteo Bosshard)
+INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES 
+('41eebc99-9c0b-4ef8-bb6d-6bb9bd380d01', 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a61', 4.0, 'Teilgenommen'),
+('41eebc99-9c0b-4ef8-bb6d-6bb9bd380d02', 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a61', 0.0, 'Offen'),
+('41eebc99-9c0b-4ef8-bb6d-6bb9bd380d03', 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a61', 0.0, 'Nicht teilgenommen entschuldigt');
+
 COMMIT;
