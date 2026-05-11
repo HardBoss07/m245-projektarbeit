@@ -87,6 +87,7 @@ pub struct User {
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Class {
     pub id: ClassId,
     pub designation: String,
@@ -97,6 +98,7 @@ pub struct Class {
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Subject {
     pub id: SubjectId,
     pub code: String,
@@ -104,6 +106,7 @@ pub struct Subject {
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Exam {
     pub id: ExamId,
     pub event_id: EventId,
@@ -112,6 +115,7 @@ pub struct Exam {
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct ExamResult {
     pub id: Uuid,
     pub exam_id: ExamId,

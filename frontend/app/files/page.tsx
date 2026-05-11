@@ -1,3 +1,5 @@
+'use client';
+
 import { MobileShell } from '@/components/organisms/MobileShell';
 import { SearchBar } from '@/components/molecules/SearchBar';
 import { Card } from '@/components/atoms/Card';

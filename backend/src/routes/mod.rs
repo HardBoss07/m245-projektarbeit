@@ -1,4 +1,5 @@
 pub mod absenzen;
+pub mod api_versioning;
 pub mod auth;
 pub mod documents;
 pub mod grades;

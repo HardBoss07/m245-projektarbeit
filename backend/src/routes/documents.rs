@@ -9,5 +9,5 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route("/", get(list_documents))
         .route("/", post(upload_document))
-        .route("/:id", get(download_document))
+        .route("/{id}", get(download_document))
 }

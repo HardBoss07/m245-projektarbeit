@@ -8,5 +8,5 @@ use axum::{
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/", get(get_grades))
-        .route("/:id", patch(update_grade))
+        .route("/{id}", patch(update_grade))
 }

@@ -14,6 +14,7 @@ pub enum AttendanceStatus {
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+#[serde(rename_all = "camelCase")]
 pub struct ClassAttendance {
     pub class_id: Uuid,
     pub class_name: String,
@@ -24,6 +25,7 @@ pub struct ClassAttendance {
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+#[serde(rename_all = "camelCase")]
 pub struct ClassSession {
     pub id: Uuid,
     pub class_id: Uuid,
@@ -32,6 +34,7 @@ pub struct ClassSession {
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+#[serde(rename_all = "camelCase")]
 pub struct AttendanceRecord {
     pub id: Uuid,
     pub session_id: Uuid,

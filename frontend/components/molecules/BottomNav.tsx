@@ -9,10 +9,10 @@ export function BottomNav() {
   const pathname = usePathname();
 
   const navItems = [
-    { href: "/files", icon: <Folder size={24} />, label: "Files" },
-    { href: "/schedule", icon: <Calendar size={24} />, label: "Timetable" },
-    { href: "/grades", icon: <GraduationCap size={24} />, label: "Grades" },
-    { href: "/profile", icon: <User size={24} />, label: "Profile" },
+    { href: "/files", icon: "folder", label: "Files" },
+    { href: "/schedule", icon: "calendar_today", label: "Timetable" },
+    { href: "/grades", icon: "school", label: "Grades" },
+    { href: "/profile", icon: "person", label: "Profile" },
   ];
 
   return (

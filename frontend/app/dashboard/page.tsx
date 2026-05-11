@@ -1,31 +1,62 @@
+'use client';
+
 import { MobileShell } from '@/components/organisms/MobileShell';
 import { BentoCard } from '@/components/molecules/BentoCard';
 import { Typography } from '@/components/atoms/Typography';
 import { ListEntry } from '@/components/molecules/ListEntry';
 import { Card } from '@/components/atoms/Card';
-import { MOCK_SUBJECTS } from '@/lib/mock-data';
+import { useUser } from '@/hooks/useUser';
+import { useGrades } from '@/hooks/useGrades';
+import { useAttendance } from '@/hooks/useAttendance';
 import Link from 'next/link';
 
 export default function DashboardPage() {
-  const latestGradesSubject = MOCK_SUBJECTS[0];
+  const { user, loading: userLoading } = useUser();
+  const { grades, loading: gradesLoading } = useGrades();
+  const { summary: attendance, loading: attendanceLoading } = useAttendance();
+
+  const loading = userLoading || gradesLoading || attendanceLoading;
+
+  if (loading) {
+    return (
+      <MobileShell title="Dashboard" subtitle="Lade Daten...">
+        <div className="p-margin flex flex-col gap-lg animate-pulse">
+          <div className="h-32 bg-slate-200 rounded-xl" />
+          <div className="grid grid-cols-2 gap-md">
+            <div className="h-24 bg-slate-200 rounded-xl" />
+            <div className="h-24 bg-slate-200 rounded-xl" />
+          </div>
+          <div className="h-48 bg-slate-200 rounded-xl" />
+        </div>
+      </MobileShell>
+    );
+  }
+
+  // Calculate average grade
+  const avgGrade = grades.length > 0 
+    ? (grades.reduce((acc, g) => acc + g.grade, 0) / grades.length).toFixed(1) 
+    : '0.0';
+
+  // Open absences (where status is 'Offen')
+  const openAbsences = attendance.filter(a => a.status === 'Offen').length;
 
   return (
-    <MobileShell title="Dashboard" subtitle="Willkommen zurück, Matteo">
+    <MobileShell title="Dashboard" subtitle={`Willkommen zurück, ${user?.firstName || 'Matteo'}`}>
       <div className="p-margin flex flex-col gap-lg">
-        {/* Next Lesson Bento */}
+        {/* Next Lesson Bento - Stub for now as timetable isn't fully integrated in hooks */}
         <Link href="/schedule">
           <BentoCard 
             title="NÄCHSTE LEKTION" 
             icon="schedule"
             footer={
               <Typography variant="label-sm" className="text-accent font-bold">
-                In 15 Minuten • Raum 302
+                In Kürze • Raum unbekannt
               </Typography>
             }
           >
-            <Typography variant="h2">Applikations-Sicherheit</Typography>
+            <Typography variant="h2">Stundenplan ansehen</Typography>
             <Typography variant="body-md" className="text-on-surface-variant">
-              Modul 245 • Informatik
+              Deine heutige Übersicht
             </Typography>
           </BentoCard>
         </Link>
@@ -34,7 +65,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 gap-md">
           <Link href="/grades">
             <BentoCard title="SCHNITT">
-              <Typography variant="display" className="text-accent">5.2</Typography>
+              <Typography variant="display" className="text-accent">{avgGrade}</Typography>
               <Typography variant="label-sm" className="text-on-surface-variant font-bold">
                 Aktuelles Semester
               </Typography>
@@ -42,7 +73,9 @@ export default function DashboardPage() {
           </Link>
           <Link href="/absences">
             <BentoCard title="ABSENZEN">
-              <Typography variant="display" className="text-error">2</Typography>
+              <Typography variant="display" className={openAbsences > 0 ? "text-error" : "text-accent"}>
+                {openAbsences}
+              </Typography>
               <Typography variant="label-sm" className="text-on-surface-variant font-bold">
                 Offene Einträge
               </Typography>
@@ -61,20 +94,27 @@ export default function DashboardPage() {
             </Link>
           </div>
           <Card className="!p-0 overflow-hidden">
-            {latestGradesSubject.grades.slice(0, 2).map(grade => (
-              <Link key={grade.id} href={`/grades/${latestGradesSubject.id}`}>
+            {grades.length > 0 ? (
+              grades.slice(0, 3).map(grade => (
                 <ListEntry 
-                  title={grade.title} 
-                  subtitle={`${latestGradesSubject.name} • ${grade.date}`} 
-                  value={grade.value.toFixed(1)} 
+                  key={grade.id}
+                  title={grade.description || 'Prüfung'} 
+                  subtitle={grade.subject} 
+                  value={grade.grade.toFixed(1)} 
                   icon="grade"
                 />
-              </Link>
-            ))}
+              ))
+            ) : (
+              <div className="p-md text-center">
+                <Typography variant="body-md" className="text-on-surface-variant italic">
+                  Noch keine Noten vorhanden
+                </Typography>
+              </div>
+            )}
           </Card>
         </section>
 
-        {/* Illustration Card (as seen in designs) */}
+        {/* Illustration Card */}
         <section className="rounded-xl overflow-hidden h-40 relative group shadow-md">
           <img 
             className="w-full h-full object-cover grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-75 transition-all duration-700" 

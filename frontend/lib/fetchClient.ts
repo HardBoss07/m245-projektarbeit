@@ -13,7 +13,7 @@ let accessToken: string | null = null;
 let isRefreshing = false;
 let refreshQueue: Array<(token: string) => void> = [];
 
-const API_BASE_URL = '/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
 /**
  * Updates the in-memory access token.

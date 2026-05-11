@@ -43,9 +43,12 @@ async fn main() {
     let app = create_app(state).await;
 
     // Run it with hyper
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
+    let port = std::env::var("BACKEND_PORT").unwrap_or_else(|_| "3001".to_string());
+    let addr = format!("0.0.0.0:{}", port);
     tracing::debug!("listening on {}", addr);
 
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(addr)
+        .await
+        .expect("Failed to bind");
     axum::serve(listener, app).await.unwrap();
 }

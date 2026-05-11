@@ -1,35 +1,40 @@
+# Stage 1: Build
 FROM rust:1.92-slim AS builder
 
 WORKDIR /app
 
-# Install build dependencies
 RUN apt-get update && apt-get install -y \
     pkg-config \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the source code
-COPY . .
-
-# Build the application
+# Copy manifests to cache dependencies
+COPY Cargo.toml Cargo.lock ./
+# Create dummy main.rs to build dependencies only
+RUN mkdir src && echo "fn main() {}" > src/main.rs
 RUN cargo build --release
 
-# Final stage
+# Copy the actual source code and sqlx metadata
+COPY src/ ./src/
+COPY .sqlx/ ./.sqlx/
+
+# Touch main.rs to ensure it builds correctly
+RUN touch src/main.rs
+ENV SQLX_OFFLINE=true
+RUN cargo build --release
+
+# Stage 2: Runtime
 FROM debian:bookworm-slim
 
 WORKDIR /app
 
-# Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     libssl3 \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the binary from the builder
 COPY --from=builder /app/target/release/wiss-tocco-backend /app/wiss-tocco-backend
 
-# Expose the port
 EXPOSE 3001
 
-# Run the binary
 CMD ["./wiss-tocco-backend"]

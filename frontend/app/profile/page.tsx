@@ -6,13 +6,19 @@ import { Typography } from '@/components/atoms/Typography';
 import { ListEntry } from '@/components/molecules/ListEntry';
 import { Button } from '@/components/atoms/Button';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@/hooks/useUser';
+import { authService } from '@/services/auth';
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { user, loading } = useUser();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await authService.logout();
     router.push('/');
   };
+
+  const initials = user ? `${user.firstName[0]}${user.lastName[0]}` : 'MT';
 
   return (
     <MobileShell title="Mein Profil">
@@ -20,12 +26,12 @@ export default function ProfilePage() {
         {/* Profile Card */}
         <div className="flex flex-col items-center gap-md py-lg">
           <div className="w-24 h-24 rounded-full bg-primary-container flex items-center justify-center text-white text-4xl font-bold shadow-lg">
-            MT
+            {loading ? '...' : initials}
           </div>
           <div className="text-center">
-            <Typography variant="h1">Matteo Tocco</Typography>
+            <Typography variant="h1">{loading ? 'Lade...' : `${user?.firstName} ${user?.lastName}`}</Typography>
             <Typography variant="body-md" className="text-on-surface-variant">
-              Informatik Applikationsentwicklung
+              {user?.roleName || 'Informatik Applikationsentwicklung'}
             </Typography>
           </div>
         </div>
@@ -36,9 +42,9 @@ export default function ProfilePage() {
             PERSÖNLICHE INFORMATIONEN
           </Typography>
           <Card className="!p-0 overflow-hidden">
-            <ListEntry title="E-Mail" subtitle="matteo.tocco@wiss.ch" icon="mail" />
-            <ListEntry title="Klasse" subtitle="AP24a" icon="group" />
-            <ListEntry title="Lehrjahr" subtitle="2. Lehrjahr" icon="calendar_today" />
+            <ListEntry title="E-Mail" subtitle={user?.email || '...'} icon="mail" />
+            <ListEntry title="Sprache" subtitle={user?.language === 'de' ? 'Deutsch' : 'English'} icon="language" />
+            <ListEntry title="Sichtbarkeit" subtitle={user?.publishDetails ? 'Öffentlich' : 'Privat'} icon="visibility" />
           </Card>
         </section>
 

@@ -1,30 +1,34 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { MobileShell } from '@/components/organisms/MobileShell';
 import { Typography } from '@/components/atoms/Typography';
 import { Card } from '@/components/atoms/Card';
 import { Icon } from '@/components/atoms/Icon';
-import { Badge } from '@/components/atoms/Badge';
+import { useTimetable } from '@/hooks/useTimetable';
+import { format, parseISO, isSameDay, startOfDay } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 export default function SchedulePage() {
   const [view, setView] = useState<'day' | 'month'>('day');
-  const days = ['Mo', 'Di', 'Mi', 'Do', 'Fr'];
-  const activeDay = 'Fr';
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const schedule = [
-    { time: '08:00', subject: 'Informatik', room: 'R302', teacher: 'Herr Müller', active: false },
-    { time: '10:00', subject: 'Mathematik', room: 'R105', teacher: 'Frau Schmid', active: false },
-    { time: '13:00', subject: 'Modul 245', room: 'R302', teacher: 'Herr Müller', active: true },
-    { time: '15:00', subject: 'Englisch', room: 'R210', teacher: 'Frau Weber', active: false },
-  ];
+  const days = ['Mo', 'Di', 'Mi', 'Do', 'Fr'];
+  const { sessions, loading, error } = useTimetable({
+    from: startOfDay(new Date()).toISOString(),
+    to: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+  });
+
+  const daySchedule = useMemo(() => {
+    return sessions.filter(s => isSameDay(parseISO(s.startTime), selectedDate));
+  }, [sessions, selectedDate]);
 
   // Month View Data (Simplified)
   const monthDays = Array.from({ length: 31 }, (_, i) => i + 1);
   const monthPadding = Array.from({ length: 4 }, (_, i) => null);
 
   return (
-    <MobileShell title="Stundenplan" subtitle={view === 'day' ? "Freitag, 8. Mai 2026" : "Mai 2026"}>
+    <MobileShell title="Stundenplan" subtitle={view === 'day' ? format(selectedDate, "eeee, d. MMMM yyyy", { locale: de }) : "Mai 2026"}>
       <div className="flex flex-col gap-md">
         {/* View Toggle */}
         <div className="px-margin pt-md">
@@ -48,13 +52,18 @@ export default function SchedulePage() {
 
         {view === 'day' ? (
           <>
-            {/* Day Selector */}
+            {/* Day Selector - Simplified for now */}
             <div className="bg-white border-y border-outline-variant px-margin py-4 flex justify-between">
-              {days.map((day) => (
+              {days.map((day, i) => (
                 <div 
                   key={day}
-                  className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-colors
-                             ${day === activeDay ? 'bg-accent text-white shadow-md' : 'text-on-surface-variant'}`}
+                  onClick={() => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + (i - d.getDay() + 1));
+                    setSelectedDate(d);
+                  }}
+                  className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-colors cursor-pointer
+                             ${isSameDay(selectedDate, new Date(new Date().setDate(new Date().getDate() + (i - new Date().getDay() + 1)))) ? 'bg-accent text-white shadow-md' : 'text-on-surface-variant'}`}
                 >
                   <Typography variant="label-sm" className="font-bold">{day}</Typography>
                 </div>
@@ -63,38 +72,54 @@ export default function SchedulePage() {
 
             {/* Timeline */}
             <div className="p-margin flex flex-col gap-md">
-              {schedule.map((item, i) => (
-                <div key={i} className="flex gap-md">
-                  <div className="w-12 flex flex-col items-center pt-2">
-                    <Typography variant="label-sm" className="font-bold text-on-surface-variant">
-                      {item.time}
-                    </Typography>
-                    <div className="w-px h-full bg-outline-variant my-2" />
-                  </div>
-                  
-                  <Card 
-                    variant={item.active ? 'glass' : 'elevated'} 
-                    className={`flex-1 flex flex-col gap-1 ${item.active ? 'border-accent border-2' : ''}`}
-                  >
-                    <div className="flex justify-between items-start">
-                      <Typography variant="body-md" className="font-bold">{item.subject}</Typography>
-                      {item.active && (
-                        <div className="flex items-center gap-1 text-accent">
-                          <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                          <Typography variant="label-sm" className="font-bold uppercase tracking-widest">Jetzt</Typography>
+              {loading ? (
+                <div className="p-md text-center animate-pulse">Lade Stundenplan...</div>
+              ) : error ? (
+                <div className="p-md text-center text-error">{error}</div>
+              ) : daySchedule.length > 0 ? (
+                daySchedule.map((item, i) => {
+                  const startTime = format(parseISO(item.startTime), 'HH:mm');
+                  const now = new Date();
+                  const isActive = now >= parseISO(item.startTime) && now <= parseISO(item.endTime);
+
+                  return (
+                    <div key={item.id} className="flex gap-md">
+                      <div className="w-12 flex flex-col items-center pt-2">
+                        <Typography variant="label-sm" className="font-bold text-on-surface-variant">
+                          {startTime}
+                        </Typography>
+                        <div className="w-px h-full bg-outline-variant my-2" />
+                      </div>
+                      
+                      <Card 
+                        variant={isActive ? 'glass' : 'elevated'} 
+                        className={`flex-1 flex flex-col gap-1 ${isActive ? 'border-accent border-2' : ''}`}
+                      >
+                        <div className="flex justify-between items-start">
+                          <Typography variant="body-md" className="font-bold">{item.subjectName}</Typography>
+                          {isActive && (
+                            <div className="flex items-center gap-1 text-accent">
+                              <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                              <Typography variant="label-sm" className="font-bold uppercase tracking-widest">Jetzt</Typography>
+                            </div>
+                          )}
                         </div>
-                      )}
+                        <Typography variant="label-sm" className="text-on-surface-variant">
+                          {item.lecturerName} • {item.roomName}
+                        </Typography>
+                      </Card>
                     </div>
-                    <Typography variant="label-sm" className="text-on-surface-variant">
-                      {item.teacher} • {item.room}
-                    </Typography>
-                  </Card>
+                  );
+                })
+              ) : (
+                <div className="p-md text-center text-on-surface-variant italic">
+                  Keine Lektionen an diesem Tag
                 </div>
-              ))}
+              )}
             </div>
           </>
         ) : (
-          /* Month View */
+          /* Month View - Keep as static for now as per design */
           <div className="p-margin space-y-lg">
             <Card variant="elevated" className="bg-white">
               <div className="grid grid-cols-7 gap-1 text-center mb-2">

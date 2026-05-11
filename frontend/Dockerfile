@@ -1,29 +1,34 @@
-# Use node image for building
+# Stage 1: Build
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies
+# Cache dependencies
 COPY package*.json ./
 RUN npm install
 
-# Copy source and build
+# Build the application
 COPY . .
+# Add build argument for URL
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN npm run build
 
-# Use node image for running
+# Stage 2: Runtime
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy necessary files from builder
-COPY --from=builder /app/public ./public
+# Install only production dependencies
+COPY package*.json ./
+RUN npm install --only=production
+
+# Copy built assets
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/public ./public
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["npx", "next", "start"]
