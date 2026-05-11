@@ -1,0 +1,74 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT \n            ts.id,\n            ts.start_time,\n            ts.end_time,\n            ts.remarks,\n            s.name as \"subject_name!\",\n            s.code as \"subject_code!\",\n            r.name as \"room_name!\",\n            CONCAT(u_lec.first_name, ' ', u_lec.last_name) as \"lecturer_name!\",\n            c.designation as \"class_designation!\"\n        FROM timetable_sessions ts\n        JOIN events e ON ts.event_id = e.id\n        JOIN subjects s ON e.subject_id = s.id\n        JOIN rooms r ON ts.room_id = r.id\n        JOIN users u_lec ON ts.lecturer_id = u_lec.id\n        JOIN classes c ON e.class_id = c.id\n        WHERE ts.start_time >= $1 AND ts.end_time <= $2\n        AND (\n            -- Student check: enrolled in the class\n            EXISTS (\n                SELECT 1 FROM class_enrollments ce \n                WHERE ce.class_id = e.class_id AND ce.user_id = $3\n            )\n            OR \n            -- Teacher check: is the lecturer\n            ts.lecturer_id = $3\n        )\n        ORDER BY ts.start_time ASC\n        LIMIT $4 OFFSET $5\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "start_time",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 2,
+        "name": "end_time",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "remarks",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "subject_name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "subject_code!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "room_name!",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "lecturer_name!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "class_designation!",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Timestamptz",
+        "Uuid",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      null,
+      false
+    ]
+  },
+  "hash": "1711dd676286afb53dc92a87b929fb34f098043b3c84da2b1bed90f3fd3e2941"
+}

@@ -1,0 +1,66 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT \n            id as \"id: _\", \n            designation, \n            short_name, \n            class_type as \"class_type: crate::models::ClassType\", \n            description, \n            min_attendance_pct\n        FROM classes \n        ORDER BY designation \n        LIMIT $1 OFFSET $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id: _",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "designation",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "short_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "class_type: crate::models::ClassType",
+        "type_info": {
+          "Custom": {
+            "name": "class_type_enum",
+            "kind": {
+              "Enum": [
+                "GE Modul",
+                "Modul",
+                "Semester",
+                "Parallelmodul",
+                "GE Überbetrieblicher Kurs"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "min_attendance_pct",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "40a3db3b7e1e8928884ab20a7feb7ba7dfd747dff92b728cfc85567e32571925"
+}

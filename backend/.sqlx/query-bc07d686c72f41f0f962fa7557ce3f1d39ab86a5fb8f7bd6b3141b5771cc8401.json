@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT \n            id, \n            designation, \n            file_path, \n            document_type as \"document_type: DocumentType\", \n            target_user_id as \"target_user_id: _\", \n            modified_by as \"modified_by: _\", \n            modified_at\n        FROM documents \n        WHERE id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "designation",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "file_path",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "document_type: DocumentType",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "target_user_id: _",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "modified_by: _",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 6,
+        "name": "modified_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "bc07d686c72f41f0f962fa7557ce3f1d39ab86a5fb8f7bd6b3141b5771cc8401"
+}

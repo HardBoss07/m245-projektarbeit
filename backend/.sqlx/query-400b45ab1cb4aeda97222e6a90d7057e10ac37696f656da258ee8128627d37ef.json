@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT \n            ar.id,\n            ar.session_id,\n            ar.student_id,\n            ar.attended_lessons,\n            ar.status as \"status: AttendanceStatus\"\n        FROM attendance_records ar\n        JOIN class_sessions cs ON ar.session_id = cs.id\n        WHERE ar.student_id = $1 AND cs.class_id = $2\n        ORDER BY cs.session_date DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "session_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "student_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "attended_lessons",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 4,
+        "name": "status: AttendanceStatus",
+        "type_info": {
+          "Custom": {
+            "name": "attendance_status_enum",
+            "kind": {
+              "Enum": [
+                "Teilgenommen",
+                "Nicht teilgenommen entschuldigt",
+                "Offen"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "400b45ab1cb4aeda97222e6a90d7057e10ac37696f656da258ee8128627d37ef"
+}

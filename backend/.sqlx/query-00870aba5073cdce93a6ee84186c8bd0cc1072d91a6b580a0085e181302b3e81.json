@@ -1,0 +1,82 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT \n            id as \"id: _\", \n            role_id as \"role_id: _\", \n            email, \n            password_hash, \n            first_name, \n            last_name, \n            gender, \n            birth_date, \n            language, \n            publish_details, \n            created_at\n        FROM users \n        WHERE id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id: _",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "role_id: _",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "password_hash",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "first_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "last_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "gender",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "birth_date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 8,
+        "name": "language",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "publish_details",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "00870aba5073cdce93a6ee84186c8bd0cc1072d91a6b580a0085e181302b3e81"
+}
