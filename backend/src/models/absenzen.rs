@@ -20,8 +20,8 @@ pub struct ClassAttendance {
     pub class_name: String,
     pub session_date: DateTime<Utc>,
     pub required_lessons: Decimal,
-    pub attended_lessons: Decimal,
-    pub status: String,
+    pub attended_lessons: Option<Decimal>,
+    pub status: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]

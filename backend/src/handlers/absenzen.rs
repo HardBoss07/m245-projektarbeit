@@ -19,12 +19,12 @@ pub async fn get_attendance_overview(
         ClassAttendance,
         r#"
         SELECT 
-            c.id as class_id,
-            c.designation as class_name,
+            c.id as "class_id",
+            c.designation as "class_name",
             cs.session_date,
             cs.required_lessons,
-            ar.attended_lessons,
-            ar.status as "status: String"
+            ar.attended_lessons as "attended_lessons?",
+            ar.status::text as "status?"
         FROM class_sessions cs
         JOIN classes c ON cs.class_id = c.id
         LEFT JOIN attendance_records ar ON cs.id = ar.session_id AND ar.student_id = $1
