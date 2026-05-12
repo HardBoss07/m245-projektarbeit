@@ -6,21 +6,29 @@ import { Input } from '@/components/atoms/Input';
 import { Button } from '@/components/atoms/Button';
 import { Icon } from '@/components/atoms/Icon';
 import { useRouter } from 'next/navigation';
+import { authService } from '@/services/auth';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    setError(null);
+    
+    try {
+      await authService.dummyOAuth();
       router.push('/dashboard');
-    }, 1000);
+    } catch (err) {
+      setError('Fehler bei der Authentifizierung. Bitte versuchen Sie es erneut.');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBypass = () => {
@@ -44,56 +52,42 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleLogin} className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-outline-variant shadow-md w-full">
-          <div className="flex flex-col gap-5 w-full">
-            <Input 
-              label="Studenten E-Mail" 
-              placeholder="vorname.nachname@wiss.ch" 
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <Input 
-              label="Passwort" 
-              placeholder="••••••••" 
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 rounded border-outline-variant text-accent focus:ring-accent" />
-              <Typography variant="label-sm">Angemeldet bleiben</Typography>
-            </label>
-            <Typography variant="label-sm" className="text-accent font-bold cursor-pointer hover:underline">
-              Passwort vergessen?
+        <div className="flex flex-col gap-6 bg-white p-8 rounded-2xl border border-outline-variant shadow-md w-full">
+          <div className="text-center mb-4">
+            <Typography variant="body-md" className="text-on-surface-variant">
+              Der lokale Login wurde durch den Microsoft OAuth Flow ersetzt.
             </Typography>
           </div>
 
+          {error && (
+            <div className="bg-error/10 text-error p-3 rounded-lg text-sm mb-4 border border-error/20">
+              {error}
+            </div>
+          )}
+
           <div className="flex flex-col gap-3">
             <Button 
-              type="submit" 
+              type="button" 
               fullWidth 
+              onClick={handleLogin}
               disabled={isLoading}
+              className="bg-[#2F2F2F] hover:bg-black"
             >
-              {isLoading ? 'Anmelden...' : 'Login'}
+              <div className="flex items-center gap-2">
+                {isLoading ? 'Verbinden...' : (
+                  <>
+                    <Icon name="login" className="text-xl" />
+                    Mit Microsoft anmelden
+                  </>
+                )}
+              </div>
             </Button>
             
-            <Button 
-              type="button"
-              variant="ghost"
-              fullWidth
-              onClick={handleBypass}
-              className="border-accent text-accent hover:bg-accent/5"
-            >
-              Dev Bypass (No Login)
-            </Button>
+            <Typography variant="label-sm" className="text-center text-on-surface-variant mt-2 italic">
+              Authentifiziert als: matteo.bosshard@wiss-edu.ch
+            </Typography>
           </div>
-        </form>
+        </div>
 
         {/* Footer */}
         <div className="text-center">
