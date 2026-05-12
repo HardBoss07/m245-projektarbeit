@@ -46,8 +46,15 @@ pub async fn dummy_oauth(
         "#,
     )
     .fetch_optional(&state.db)
-    .await?
-    .ok_or(AppError::Unauthorized)?;
+    .await?;
+
+    let user = match user {
+        Some(u) => u,
+        None => {
+            tracing::error!("Dummy OAuth user not found in database. Ensure example_data.sql is loaded.");
+            return Err(AppError::Unauthorized);
+        }
+    };
 
     // 5. Token Generation (Reuse existing logic)
     let token = create_token(user.id, &user.role_name, &state.jwt_secret)?;

@@ -49,3 +49,15 @@ pub fn check_role(claims: &Claims, required_role: &str) -> Result<(), AppError> 
         Err(AppError::Forbidden)
     }
 }
+
+pub async fn auth_middleware(
+    claims: Claims,
+    request: axum::extract::Request,
+    next: axum::middleware::Next,
+) -> Result<axum::response::Response, AppError> {
+    // The Claims extractor will already return 401 if the token is missing/invalid
+    // This middleware just ensures the extractor is run for the request
+    let mut request = request;
+    request.extensions_mut().insert(claims);
+    Ok(next.run(request).await)
+}
