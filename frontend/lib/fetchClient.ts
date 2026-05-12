@@ -9,17 +9,22 @@ type FetchOptions = RequestInit & {
   skipAuth?: boolean;
 };
 
-let accessToken: string | null = null;
 let isRefreshing = false;
 let refreshQueue: Array<(token: string) => void> = [];
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
 /**
- * Updates the in-memory access token.
+ * Updates the stored access token.
  */
 export const setAccessToken = (token: string | null) => {
-  accessToken = token;
+  if (typeof window !== 'undefined') {
+    if (token) {
+      localStorage.setItem('auth_token', token);
+    } else {
+      localStorage.removeItem('auth_token');
+    }
+  }
 };
 
 /**
@@ -34,8 +39,12 @@ export const fetchClient = async <T>(
 
   // Build headers
   const headers = new Headers(init.headers);
-  if (!skipAuth && accessToken) {
-    headers.set('Authorization', `Bearer ${accessToken}`);
+  
+  // Retrieve token from localStorage
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+
+  if (!skipAuth && token) {
+    headers.set('Authorization', `Bearer ${token}`);
   }
   if (!headers.has('Content-Type') && !(init.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');

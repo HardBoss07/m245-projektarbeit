@@ -9,21 +9,26 @@ export function useTimetable(params: TimetableQueryParams = {}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const paramsKey = JSON.stringify(params);
+
   useEffect(() => {
+    let isMounted = true;
     const fetchTimetable = async () => {
       try {
         setLoading(true);
+        setError(null);
         const data = await timetableService.getSessions(params);
-        setSessions(data);
+        if (isMounted) setSessions(data);
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch timetable');
+        if (isMounted) setError(err.message || 'Failed to fetch timetable');
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchTimetable();
-  }, [params.from, params.to, params.limit, params.offset]);
+    return () => { isMounted = false; };
+  }, [paramsKey]);
 
   return { sessions, loading, error };
 }
