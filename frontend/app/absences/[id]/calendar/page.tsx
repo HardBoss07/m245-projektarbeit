@@ -1,41 +1,55 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useMemo } from "react";
 import { MobileShell } from '@/components/organisms/MobileShell';
 import { Typography } from '@/components/atoms/Typography';
 import { Card } from '@/components/atoms/Card';
-import { MOCK_SUBJECTS, MOCK_ABSENCES } from '@/lib/mock-data';
 import { Icon } from '@/components/atoms/Icon';
+import { useAttendance } from '@/hooks/useAttendance';
+import { format, parseISO, getDate, isSameDay } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 export default function AbsenceCalendarPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const subject = MOCK_SUBJECTS.find(s => s.id === id);
-  const absences = MOCK_ABSENCES[id] || [];
+  const { summary, loading, error } = useAttendance();
   
-  const [currentMonth, setCurrentMonth] = useState(4); // May (0-indexed 4)
-  const monthName = "Mai 2026";
-  
+  const classSessions = useMemo(() => summary.filter(s => s.classId === id), [summary, id]);
+  const className = classSessions.length > 0 ? classSessions[0].className : "Kalender";
+
   // Basic calendar logic (simplified for May 2026)
-  // May 1 2026 is a Friday
   const daysInMonth = 31;
   const startDay = 4; // 0=Mon, ..., 4=Fri
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
   const padding = Array.from({ length: startDay }, (_, i) => null);
 
-  const isAbsent = (day: number) => {
-    const dateStr = `2026-05-${day.toString().padStart(2, '0')}`;
-    return absences.find(a => a.date === dateStr);
+  const getAbsenceForDay = (day: number) => {
+    return classSessions.find(s => {
+      const date = parseISO(s.sessionDate);
+      return getDate(date) === day && (s.status === 'Offen' || s.status === 'Nicht teilgenommen entschuldigt' || !s.status);
+    });
   };
 
-  if (!subject) return <div>Subject not found</div>;
+  if (loading) return <MobileShell title="Lade..." showBack><div className="p-margin animate-pulse">Lade Kalender...</div></MobileShell>;
+
+  if (error || classSessions.length === 0) {
+    return (
+      <MobileShell title="Nicht gefunden" showBack>
+        <div className="p-margin text-center">
+          <Typography variant="body-md" className="text-on-surface-variant">
+            {error ? `Fehler: ${error}` : `Keine Daten für den Kalender der Klasse "${id}" gefunden.`}
+          </Typography>
+        </div>
+      </MobileShell>
+    );
+  }
 
   return (
-    <MobileShell title={`${subject.name} Kalender`} showBack>
+    <MobileShell title={`${className} Kalender`} showBack>
       <div className="p-margin flex flex-col gap-lg">
         {/* Calendar Card */}
         <Card variant="elevated" className="bg-white">
           <div className="flex justify-between items-center mb-md">
-            <Typography variant="h2">{monthName}</Typography>
+            <Typography variant="h2">Mai 2026</Typography>
             <div className="flex gap-sm">
               <button className="p-1 hover:bg-surface-container rounded-full transition-colors">
                 <Icon name="chevron_left" />
@@ -57,12 +71,15 @@ export default function AbsenceCalendarPage({ params }: { params: Promise<{ id: 
           <div className="grid grid-cols-7 gap-1">
             {padding.map((_, i) => <div key={`p-${i}`} className="h-10" />)}
             {days.map(day => {
-              const abs = isAbsent(day);
+              const abs = getAbsenceForDay(day);
+              const isOffen = abs?.status === 'Offen' || !abs?.status;
+              const isEntschuldigt = abs?.status === 'Nicht teilgenommen entschuldigt';
+
               return (
                 <div 
                   key={day} 
                   className={`h-10 flex items-center justify-center rounded-full transition-all text-sm font-medium
-                             ${abs ? (abs.status === 'unexcused' ? 'bg-error text-white shadow-md' : 'bg-success text-white shadow-md') : 'hover:bg-surface-container'}`}
+                             ${abs ? (isOffen ? 'bg-error text-white shadow-md' : isEntschuldigt ? 'bg-success text-white shadow-md' : 'bg-primary-container text-white') : 'hover:bg-surface-container'}`}
                 >
                   {day}
                 </div>

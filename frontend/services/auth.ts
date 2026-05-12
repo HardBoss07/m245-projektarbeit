@@ -12,6 +12,15 @@ export const authService = {
     return res;
   },
 
+  async dummyOAuth(): Promise<AuthResponse> {
+    const res = await fetchClient<AuthResponse>('/auth/dummy-oauth', {
+      method: 'POST',
+      skipAuth: true,
+    });
+    setAccessToken(res.token);
+    return res;
+  },
+
   async register(data: RegisterRequest): Promise<void> {
     return fetchClient<void>('/auth/register', {
       method: 'POST',

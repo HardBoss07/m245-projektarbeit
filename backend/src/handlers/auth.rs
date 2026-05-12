@@ -3,7 +3,6 @@ use crate::errors::AppError;
 use crate::models::Role;
 use crate::models::auth::{RefreshToken, UserAuth};
 use crate::services::auth::{create_refresh_token, create_token};
-use crate::services::hash::verify_password;
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use axum_extra::extract::CookieJar;
 use axum_extra::extract::cookie::{Cookie, SameSite};
@@ -23,28 +22,34 @@ pub struct AuthResponse {
 }
 
 pub async fn login(
+    State(_state): State<AppState>,
+    _jar: CookieJar,
+    Json(_payload): Json<LoginRequest>,
+) -> Result<impl IntoResponse, AppError> {
+    Err::<StatusCode, AppError>(AppError::Unauthorized) // Legacy auth disabled
+}
+
+pub async fn dummy_oauth(
     State(state): State<AppState>,
     jar: CookieJar,
-    Json(payload): Json<LoginRequest>,
 ) -> Result<impl IntoResponse, AppError> {
+    // 3. Simulate Latency (Fixed 750ms for local dev)
+    tokio::time::sleep(std::time::Duration::from_millis(750)).await;
+
+    // 4. Hardcoded User Auth (matteo.bosshard@wiss-edu.ch)
     let user = sqlx::query_as::<_, crate::models::auth::UserAuth>(
         r#"
         SELECT u.id, u.password_hash, r.name as role_name
         FROM users u
         JOIN roles r ON u.role_id = r.id
-        WHERE u.email = $1
+        WHERE u.email = 'matteo.bosshard@wiss-edu.ch'
         "#,
     )
-    .bind(payload.email)
     .fetch_optional(&state.db)
     .await?
     .ok_or(AppError::Unauthorized)?;
 
-    let password_hash = user.password_hash.ok_or(AppError::Unauthorized)?;
-    if !verify_password(&payload.password, &password_hash)? {
-        return Err(AppError::Unauthorized);
-    }
-
+    // 5. Token Generation (Reuse existing logic)
     let token = create_token(user.id, &user.role_name, &state.jwt_secret)?;
     let refresh_token = create_refresh_token();
     let family_id = Uuid::new_v4();
@@ -68,7 +73,7 @@ pub async fn login(
         .path("/")
         .http_only(true)
         .same_site(SameSite::Strict)
-        .secure(true) // Assume HTTPS in prod
+        .secure(false) // Disable for local dev compatibility
         .expires(Some(std::time::SystemTime::from(expires_at).into()))
         .build();
 
@@ -161,7 +166,7 @@ pub async fn refresh(
         .path("/")
         .http_only(true)
         .same_site(SameSite::Strict)
-        .secure(true)
+        .secure(false) // Disable for local dev compatibility
         .expires(Some(std::time::SystemTime::from(expires_at).into()))
         .build();
 

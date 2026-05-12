@@ -1,34 +1,66 @@
 "use client";
 
-import { use } from "react";
+import { use, useMemo } from "react";
 import { MobileShell } from '@/components/organisms/MobileShell';
 import { Typography } from '@/components/atoms/Typography';
 import { Card } from '@/components/atoms/Card';
-import { ListEntry } from '@/components/molecules/ListEntry';
-import { MOCK_SUBJECTS, MOCK_ABSENCES } from '@/lib/mock-data';
 import { Badge } from '@/components/atoms/Badge';
+import { useAttendance, useAttendanceDetails } from '@/hooks/useAttendance';
+import { format, parseISO } from 'date-fns';
+import { de } from 'date-fns/locale';
 import Link from 'next/link';
 
 export default function AbsenceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const subject = MOCK_SUBJECTS.find(s => s.id === id);
-  const absences = MOCK_ABSENCES[id] || [];
+  const { summary, loading: summaryLoading, error: summaryError } = useAttendance();
+  const { details, loading: detailsLoading, error: detailsError } = useAttendanceDetails(id);
 
-  if (!subject) return <div>Subject not found</div>;
+  const classData = useMemo(() => {
+    const classSessions = summary.filter(s => s.classId === id);
+    if (classSessions.length === 0) return null;
+
+    const totalRequired = classSessions.reduce((acc, s) => acc + Number(s.requiredLessons), 0);
+    const totalAttended = classSessions.reduce((acc, s) => acc + (s.attendedLessons ? Number(s.attendedLessons) : 0), 0);
+    const openEntries = classSessions.filter(s => s.status === 'Offen' || !s.status).length;
+
+    return {
+      name: classSessions[0].className,
+      totalMissed: totalRequired - totalAttended,
+      openEntries,
+      history: classSessions
+    };
+  }, [summary, id]);
+
+  const loading = summaryLoading || detailsLoading;
+  const error = summaryError || detailsError;
+
+  if (loading) return <MobileShell title="Lade..." showBack><div className="p-margin animate-pulse">Lade Absenzendetails...</div></MobileShell>;
+
+  if (error || !classData) {
+    return (
+      <MobileShell title="Nicht gefunden" showBack>
+        <div className="p-margin text-center">
+          <Typography variant="body-md" className="text-on-surface-variant">
+            {error ? `Fehler: ${error}` : `Keine Daten für die Klasse "${id}" gefunden.`}
+          </Typography>
+        </div>
+      </MobileShell>
+    );
+  }
 
   return (
-    <MobileShell title={subject.name} subtitle="Absenzübersicht" showBack>
+    <MobileShell title={classData.name} subtitle="Absenzübersicht" showBack>
       <div className="p-margin flex flex-col gap-lg">
         {/* Stats */}
         <div className="grid grid-cols-2 gap-md">
           <Card variant="elevated" className="flex flex-col justify-between h-24">
-            <Typography variant="label-sm" className="text-on-surface-variant font-bold">GESAMT</Typography>
-            <Typography variant="display" className="text-primary">{subject.totalAbsences}h</Typography>
+            <Typography variant="label-sm" className="text-on-surface-variant font-bold">FEHLSTUNDEN</Typography>
+            <Typography variant="display" className="text-primary">{classData.totalMissed.toFixed(1)}L</Typography>
           </Card>
-          <Card variant="elevated" className={`flex flex-col justify-between h-24 ${subject.unexcusedAbsences > 0 ? 'bg-error-container/20 border-error/20' : ''}`}>
-            <Typography variant="label-sm" className="text-on-surface-variant font-bold">OFFEN</Typography>
-            <Typography variant="display" className={subject.unexcusedAbsences > 0 ? 'text-error' : 'text-primary'}>
-              {subject.unexcusedAbsences}h
+          <Card variant="elevated" className={`flex flex-col justify-between h-24 ${classData.openEntries > 0 ? 'bg-error-container/20 border-error/20' : ''}`}>
+            <Typography variant="label-sm" className="text-on-surface-variant font-bold">OFFENE EINTRÄGE</Typography>
+            <Typography variant="display" className={classData.openEntries > 0 ? "text-error" : "text-primary"}>
+              {classData.openEntries}
             </Typography>
           </Card>
         </div>
@@ -52,26 +84,21 @@ export default function AbsenceDetailPage({ params }: { params: Promise<{ id: st
             Verlauf
           </Typography>
           <Card className="!p-0 overflow-hidden">
-            {absences.map((abs, i) => (
-              <div key={abs.id} className="border-b border-outline-variant last:border-0 p-md flex items-center justify-between">
+            {classData.history.map((entry, i) => (
+              <div key={`${entry.classId}-${entry.sessionDate}`} className="border-b border-outline-variant last:border-0 p-md flex items-center justify-between">
                 <div className="flex flex-col">
-                  <Typography variant="body-md" className="font-bold">{abs.date}</Typography>
+                  <Typography variant="body-md" className="font-bold">
+                    {format(parseISO(entry.sessionDate), 'eeee, d. MMMM', { locale: de })}
+                  </Typography>
                   <Typography variant="label-sm" className="text-on-surface-variant">
-                    {abs.duration}h • {abs.reason || 'Kein Grund angegeben'}
+                    {entry.requiredLessons} Lekt. • {entry.status || 'Offen'}
                   </Typography>
                 </div>
-                <Badge variant={abs.status === 'excused' ? 'green' : abs.status === 'unexcused' ? 'red' : 'cyan'}>
-                  {abs.status.toUpperCase()}
+                <Badge variant={entry.status === 'Teilgenommen' ? 'green' : entry.status === 'Offen' ? 'cyan' : 'red'}>
+                  {(entry.status || 'OFFEN').toUpperCase()}
                 </Badge>
               </div>
             ))}
-            {absences.length === 0 && (
-              <div className="p-xl text-center">
-                <Typography variant="body-md" className="text-on-surface-variant italic">
-                  Keine Absenzen erfasst
-                </Typography>
-              </div>
-            )}
           </Card>
         </section>
       </div>

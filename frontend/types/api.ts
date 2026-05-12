@@ -9,7 +9,7 @@ export type { Document, Subject, SchoolClass };
 export interface Grade {
   id: string;
   subject: string;
-  grade: number;
+  grade: number | string | null;
   weight: number;
   description: string;
 }
@@ -17,7 +17,7 @@ export interface Grade {
 export interface SubjectGrades {
   subject: string;
   grades: Grade[];
-  average: number;
+  average: number | string | null;
 }
 
 export interface GradesQueryParams {
@@ -58,8 +58,8 @@ export interface AttendanceSummary {
   className: string;
   sessionDate: string;
   requiredLessons: number;
-  attendedLessons: number;
-  status: string;
+  attendedLessons: number | null;
+  status: string | null;
 }
 
 export interface AttendanceDetail {

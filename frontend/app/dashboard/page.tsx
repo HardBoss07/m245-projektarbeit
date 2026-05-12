@@ -34,7 +34,7 @@ export default function DashboardPage() {
 
   // Calculate average grade
   const avgGrade = grades.length > 0 
-    ? (grades.reduce((acc, g) => acc + g.grade, 0) / grades.length).toFixed(1) 
+    ? (grades.reduce((acc, g) => acc + (g.grade ? Number(g.grade) : 0), 0) / grades.length).toFixed(1) 
     : '0.0';
 
   // Open absences (where status is 'Offen')
@@ -100,7 +100,7 @@ export default function DashboardPage() {
                   key={grade.id}
                   title={grade.description || 'Prüfung'} 
                   subtitle={grade.subject} 
-                  value={grade.grade.toFixed(1)} 
+                  value={grade.grade ? Number(grade.grade).toFixed(1) : 'N/A'} 
                   icon="grade"
                 />
               ))

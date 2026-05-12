@@ -12,10 +12,22 @@ use uuid::Uuid;
 
 #[derive(Debug, Deserialize)]
 pub struct TimetableQuery {
-    pub from: Option<DateTime<Utc>>,
-    pub to: Option<DateTime<Utc>>,
+    pub from: Option<String>,
+    pub to: Option<String>,
     #[serde(flatten)]
     pub pagination: Pagination,
+}
+
+fn parse_date(date_str: &Option<String>, default: DateTime<Utc>) -> DateTime<Utc> {
+    date_str
+        .as_ref()
+        .and_then(|s| {
+            DateTime::parse_from_rfc3339(s)
+                .map(|dt| dt.with_timezone(&Utc))
+                .ok()
+                .or_else(|| s.parse::<DateTime<Utc>>().ok())
+        })
+        .unwrap_or(default)
 }
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
@@ -39,12 +51,8 @@ pub async fn get_timetable(
     claims: Claims,
     Query(query): Query<TimetableQuery>,
 ) -> Result<Json<Vec<TimetableEntry>>, AppError> {
-    let from = query
-        .from
-        .unwrap_or_else(|| Utc::now() - chrono::Duration::days(7));
-    let to = query
-        .to
-        .unwrap_or_else(|| Utc::now() + chrono::Duration::days(7));
+    let from = parse_date(&query.from, Utc::now() - chrono::Duration::days(7));
+    let to = parse_date(&query.to, Utc::now() + chrono::Duration::days(7));
 
     // We join several tables to get a complete view.
     // Logic:
