@@ -1,6 +1,5 @@
 use moka::future::Cache;
 use sqlx::postgres::PgPoolOptions;
-use std::net::SocketAddr;
 use std::time::Duration;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use wiss_tocco_backend::{AppState, create_app};
