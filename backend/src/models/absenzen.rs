@@ -5,7 +5,7 @@ use sqlx::{FromRow, Type};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Type)]
-#[sqlx(type_name = "attendance_status_enum", rename_all = "snake_case")]
+#[sqlx(type_name = "attendance_status_enum")]
 pub enum AttendanceStatus {
     Teilgenommen,
     #[sqlx(rename = "Nicht teilgenommen entschuldigt")]

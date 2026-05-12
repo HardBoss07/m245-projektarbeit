@@ -48,7 +48,8 @@ define_id!(ExamId);
 // ==========================================
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Type, PartialEq)]
-#[sqlx(type_name = "class_type_enum", rename_all = "snake_case")]
+#[sqlx(type_name = "class_type_enum")]
+#[serde(rename_all = "snake_case")]
 pub enum ClassType {
     #[sqlx(rename = "GE Modul")]
     GeModul,
