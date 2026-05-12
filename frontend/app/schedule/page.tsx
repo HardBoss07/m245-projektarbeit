@@ -14,10 +14,17 @@ export default function SchedulePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const days = ['Mo', 'Di', 'Mi', 'Do', 'Fr'];
-  const { sessions, loading, error } = useTimetable({
-    from: startOfDay(new Date()).toISOString(),
-    to: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-  });
+  const params = useMemo(() => {
+    // Standardize ISO strings to exclude milliseconds (e.g., YYYY-MM-DDTHH:mm:ssZ)
+    const formatDate = (date: Date) => date.toISOString().split('.')[0] + 'Z';
+    
+    return {
+      from: formatDate(startOfDay(new Date())),
+      to: formatDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))
+    };
+  }, []);
+
+  const { sessions, loading, error } = useTimetable(params);
 
   const daySchedule = useMemo(() => {
     return sessions.filter(s => isSameDay(parseISO(s.startTime), selectedDate));

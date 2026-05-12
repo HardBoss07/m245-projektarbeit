@@ -21,15 +21,16 @@ export default function GradesPage() {
         count: 0
       };
     }
+    const gradeValue = grade.grade ? Number(grade.grade) : 0;
     acc[grade.subject].grades.push(grade);
-    acc[grade.subject].total += grade.grade;
+    acc[grade.subject].total += gradeValue;
     acc[grade.subject].count += 1;
     return acc;
   }, {} as Record<string, any>);
 
   const subjectList = Object.values(subjects);
   const totalAvg = grades.length > 0 
-    ? (grades.reduce((acc, g) => acc + g.grade, 0) / grades.length).toFixed(1)
+    ? (grades.reduce((acc, g) => acc + (g.grade ? Number(g.grade) : 0), 0) / grades.length).toFixed(1)
     : '0.0';
 
   return (
