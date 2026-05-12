@@ -13,7 +13,6 @@ INSERT INTO rooms (id, name) VALUES
 ('986843c8-a8eb-4edb-9223-59bd63e7acbf', 'ZH 403'),
 ('851b52be-39a8-4d81-9a9a-10110e1e2769', 'ZH 402'),
 ('97e9ed34-e814-47ba-82cb-75b5424d7d22', 'ZH 401'),
-('c3dc3890-d5d2-4090-9fe2-e9a3e4f4d8c1', 'ZH 404'),
 ('87f6aa43-a42a-473d-81b9-62d7c3dc6e6c', 'ZH 405'),
 ('59eafba4-7f64-479f-b6a4-8d314073039f', 'ZH 406'),
 ('acd8f321-3841-4b7e-b05a-9a9d63689191', 'ZH 407'),
@@ -23,13 +22,12 @@ INSERT INTO rooms (id, name) VALUES
 ('22deceb1-38b6-42bc-81d7-26636cf4fb28', 'ZH 206'),
 ('5b58d559-6b17-48c9-a10a-60133aa51c7d', 'ZH 208'),
 ('1037783a-f959-4caa-9373-dc5c59e48a47', 'ZH 205'),
-('b64fe99f-3406-4800-8941-cacdb6494422', 'ZH 402'),
 ('39b0b836-bf1f-4907-8a9a-38ac245558ef', 'online Online'),
 ('ee2c4141-98ae-4fa8-8d1d-8d8ce59bbfdd', 'ZH 203');
 
 -- 3. CLASSES
-INSERT INTO classes (id, designation) VALUES 
-('0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'IFZK-2524-017');
+INSERT INTO classes (id, designation, short_name, class_type) VALUES 
+('0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'IFZK-2524-017', 'IFZK-2524', 'Semester');
 
 -- 4. SUBJECTS
 INSERT INTO subjects (id, code, name) VALUES 
@@ -63,16 +61,16 @@ INSERT INTO class_enrollments (user_id, class_id) VALUES
 
 -- 7. EVENTS
 INSERT INTO events (id, subject_id, class_id, event_shortcut) VALUES 
-('77543c50-e110-437b-8ade-0d3b9c8210d3', 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a51', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', '32325 / IFZK-2524-017-S1-231'),
-('9687c414-2c1b-4aaf-a955-1406c925d7cb', 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a53', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', '32326 / IFZK-2524-017-S1-431'),
-('c09cb553-b309-4a83-8deb-ea6826374983', 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a56', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', '32324 / IFZK-2524-017-S1-UEK-187'),
-('8d9808fb-92f9-4668-9fe5-509bda7d4b3c', 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a59', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'IFZK-2524-017-S2-254'),
-('59c2e4cb-e2d5-460d-a2e5-0fbddabf94aa', 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380011', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'M241-EVENT'),
-('7b5d498b-321e-46b6-b0b4-f5043ccf2dc9', 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380012', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'M245-EVENT'),
-('8cc371ae-62b6-4a40-b8a5-0f8b783273c0', 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380014', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'M306-EVENT'),
-('6bf3b23b-db85-405b-8621-951032cc0d2d', 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380015', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'M346-EVENT'),
-('c623987c-c86c-4876-a348-a61216926bd2', 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380016', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'MAT-EVENT'),
-('1872c87a-eeaf-42ba-91dd-8088f7f83444', 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380017', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'ENG-EVENT');
+('77543c50-e110-437b-8ade-0d3b9c8210d3', 'bbf23ed0-e35e-40c5-a7bd-6caaa569fcd3', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', '32325 / IFZK-2524-017-S1-231'),
+('9687c414-2c1b-4aaf-a955-1406c925d7cb', 'd7913b96-8959-4d6f-8fe4-ecf499b73dbc', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', '32326 / IFZK-2524-017-S1-431'),
+('c09cb553-b309-4a83-8deb-ea6826374983', '75f1d838-2259-40d5-ac3e-3bf702b20d30', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', '32324 / IFZK-2524-017-S1-UEK-187'),
+('8d9808fb-92f9-4668-9fe5-509bda7d4b3c', '47f11c9b-82f4-4315-85fb-512c3fd8ad3d', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'IFZK-2524-017-S2-254'),
+('59c2e4cb-e2d5-460d-a2e5-0fbddabf94aa', 'fde32150-c6e6-4c6c-84da-de3776557bc0', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'M241-EVENT'),
+('7b5d498b-321e-46b6-b0b4-f5043ccf2dc9', '72a83a99-e2b6-4480-b600-6ddcf2b3fa4c', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'M245-EVENT'),
+('8cc371ae-62b6-4a40-b8a5-0f8b783273c0', 'a17ffc67-e50b-4da5-b7f1-7c22a3693ace', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'M306-EVENT'),
+('6bf3b23b-db85-405b-8621-951032cc0d2d', 'b0ad1b27-cf4c-4156-84db-becfd2fe6444', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'M346-EVENT'),
+('c623987c-c86c-4876-a348-a61216926bd2', '6c0d18df-bc0d-4148-a7f4-cf04ac104b46', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'MAT-EVENT'),
+('1872c87a-eeaf-42ba-91dd-8088f7f83444', 'c9dacc33-bfad-452d-a841-fb77b74122ad', '0e2b8f63-3ba9-4963-af25-33a31a6431b8', 'ENG-EVENT');
 
 -- 8. TIMETABLE SESSIONS
 INSERT INTO timetable_sessions (id, event_id, room_id, lecturer_id, start_time, end_time, remarks) VALUES 
