@@ -1,39 +1,37 @@
-# Handoff: Authentication & Routing Stability Fix
+# Handoff: Frontend UI Modernization & Data Integrity
 
 ## Goal
 
-The primary goal was to resolve a **401 Unauthorized** error on the `dummy-oauth` endpoint and establish a robust, scalable routing architecture that separates public and protected API endpoints.
+The primary goal was to enhance the application's UX through a reusable, interactive `Calendar` molecule for timetable and absence management, refactor the `Grades` screen to support an expandable, categorized data view, and generate a comprehensive, strictly valid example dataset to support end-to-end testing and performance demonstration.
 
 ## Current State
 
-- **Fixed**: The `dummy-oauth` endpoint was failing because it was either trapped behind an implicit auth check or because the database transaction for seed data rolled back.
-- **Routing**: Refactored `api_versioning.rs` to use a clear `public_routes` vs `protected_routes` split.
-- **Middleware**: Implemented a dedicated `auth_middleware` in `backend/src/middleware/auth.rs` that leverages the `Claims` extractor.
-- **Database**: Corrected `database/example_data.sql`.
-  - Removed duplicate room names (ZH 404, ZH 402) that violated `UNIQUE` constraints.
-  - Synchronized `subject_id` UUIDs in the `events` table with the `subjects` table to prevent foreign key violations.
-- **Types**: Derived `Clone` for the `Claims` struct in `backend/src/services/auth.rs` to allow it to be inserted into request extensions by the middleware.
-- **Backend**: Compiles successfully and passes `cargo check`.
+- **Calendar Integration**: Implemented a reusable `Calendar` molecule (`frontend/components/molecules/Calendar.tsx`) supporting dynamic month navigation, date selection, and status-based highlighting (errors for open absences, success for excused). Integrated this into `SchedulePage` and the absence detail views.
+- **Grades Refactor**: Unified the data source for Grades across the app using a singular `useGrades` hook and refined the `Grade` interface. Implemented a grouped, accordion-style view in the Grades screen, allowing users to drill down into specific exam weights (ZP vs. LB).
+- **Example Data**: Generated a large-scale, high-volume `example_data.sql` script.
+  - Strictly consumed UUIDs from `v4_uuids.txt` to ensure relational integrity.
+  - Populated data for 30 students, 3 classes, and 30 sessions, including full attendance and grade records.
+  - Ensured adherence to business logic (4.0-lesson half-day sessions, 10-session schedule, and correct exam weightings).
+- **Type Safety**: Fixed a build-time TypeScript error in the `Badge` component by adding support for the `outline` variant.
 
 ## Files Actively Involved
 
-- `backend/src/routes/api_versioning.rs`: Defines the router hierarchy and middleware application.
-- `backend/src/middleware/auth.rs`: Contains the `auth_middleware` logic.
-- `backend/src/handlers/auth.rs`: Contains the `dummy_oauth` and `refresh` handlers.
-- `database/example_data.sql`: The seed data script.
-- `backend/src/services/auth.rs`: Definition of the `Claims` struct.
+- `frontend/components/molecules/Calendar.tsx`: New reusable calendar component.
+- `frontend/app/schedule/page.tsx`: Integrated new calendar.
+- `frontend/app/absences/page.tsx`: Added calendar view toggle.
+- `frontend/app/grades/page.tsx`: Grouped, expandable grades list.
+- `database/example_data.sql`: High-volume populated dataset.
+- `v4_uuids.txt`: Source for UUID consumption.
 
 ## Investigation History & Learnings
 
-- **Initial Report**: `POST /api/v1/auth/dummy-oauth` returned a 401 error.
-- **Theory 1 (Routing)**: Suspected the route was accidentally protected by an auth layer.
-- **Theory 2 (Data Mismatch)**: Audited the seed data and found that the transaction was failing and rolling back, leaving the `users` table empty.
-- **Theory 3 (Compilation)**: Encounted a `Clone` trait bound error when trying to use `Claims` in the middleware, resolved via `#[derive(Clone)]`.
-- **Action**: Corrected the SQL seed data, refactored the router, and enhanced auth handler logging.
+- **Data Consistency**: Identified discrepancies in grade data presentation. Solved by aligning frontend `Grade` interface with backend types and centralized hook usage.
+- **Constraint Handling**: Generating valid SQL for PostgreSQL required careful mapping of foreign keys using the provided UUID list, ensuring no orphans or FK violations.
+- **Typing**: Encountered build errors when introducing new UI variations (Badges). Resolved by hardening component types.
 
 ## Next Steps
 
-1. **Live Login Test**: Perform a login attempt in the browser to verify that the `refresh_token` cookie is correctly set and the JWT is returned.
-2. **SQLx Preparation**: Once the database is running and accessible, execute `cargo sqlx prepare` in the `backend` directory to refresh the `.sqlx/` metadata.
-3. **Frontend Interceptor Check**: Ensure the frontend `fetchClient.ts` is correctly handling the transition from 401 to the `/refresh` endpoint now that routing is strictly separated.
-4. **Environment Variables**: Verify that `JWT_SECRET` and `DATABASE_URL` are consistent across the Docker environment and local `.env` files.
+1. **Verify Integration**: Perform end-to-end testing of the new calendar interactivity with the live backend endpoints.
+2. **Performance Audit**: Utilize the high-volume dataset to audit list performance and pagination implementation.
+3. **SSE Implementation**: Move to Phase 5 of the backend roadmap: implementing Server-Sent Events (SSE) for real-time notifications on grade updates.
+4. **Final Polish**: Run a lint/type-check pass across the whole workspace to ensure complete consistency following the recent refactoring.
