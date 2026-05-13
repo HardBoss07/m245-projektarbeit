@@ -5,37 +5,49 @@ import { MobileShell } from '@/components/organisms/MobileShell';
 import { Typography } from '@/components/atoms/Typography';
 import { Card } from '@/components/atoms/Card';
 import { Icon } from '@/components/atoms/Icon';
+import { Calendar } from '@/components/molecules/Calendar';
 import { useTimetable } from '@/hooks/useTimetable';
-import { format, parseISO, isSameDay, startOfDay } from 'date-fns';
+import { format, parseISO, isSameDay, startOfDay, startOfMonth, endOfMonth } from 'date-fns';
 import { de } from 'date-fns/locale';
 
 export default function SchedulePage() {
   const [view, setView] = useState<'day' | 'month'>('day');
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const days = ['Mo', 'Di', 'Mi', 'Do', 'Fr'];
-  const params = useMemo(() => {
-    // Standardize ISO strings to exclude milliseconds (e.g., YYYY-MM-DDTHH:mm:ssZ)
+  
+  const timetableParams = useMemo(() => {
+    // Standardize ISO strings to exclude milliseconds
     const formatDate = (date: Date) => date.toISOString().split('.')[0] + 'Z';
     
+    // Fetch for the entire current month to show dots in calendar
     return {
-      from: formatDate(startOfDay(new Date())),
-      to: formatDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))
+      from: formatDate(startOfMonth(currentMonth)),
+      to: formatDate(endOfMonth(currentMonth))
     };
-  }, []);
+  }, [currentMonth]);
 
-  const { sessions, loading, error } = useTimetable(params);
+  const { sessions, loading, error } = useTimetable(timetableParams);
 
   const daySchedule = useMemo(() => {
     return sessions.filter(s => isSameDay(parseISO(s.startTime), selectedDate));
   }, [sessions, selectedDate]);
 
-  // Month View Data (Simplified)
-  const monthDays = Array.from({ length: 31 }, (_, i) => i + 1);
-  const monthPadding = Array.from({ length: 4 }, (_, i) => null);
+  const eventDates = useMemo(() => {
+    return sessions.map(s => parseISO(s.startTime));
+  }, [sessions]);
+
+  const handleDateClick = (date: Date) => {
+    setSelectedDate(date);
+    setView('day');
+  };
 
   return (
-    <MobileShell title="Stundenplan" subtitle={view === 'day' ? format(selectedDate, "eeee, d. MMMM yyyy", { locale: de }) : "Mai 2026"}>
+    <MobileShell 
+      title="Stundenplan" 
+      subtitle={view === 'day' ? format(selectedDate, "eeee, d. MMMM yyyy", { locale: de }) : format(currentMonth, "MMMM yyyy", { locale: de })}
+    >
       <div className="flex flex-col gap-md">
         {/* View Toggle */}
         <div className="px-margin pt-md">
@@ -59,22 +71,25 @@ export default function SchedulePage() {
 
         {view === 'day' ? (
           <>
-            {/* Day Selector - Simplified for now */}
+            {/* Day Selector - 5 day work week around selected date */}
             <div className="bg-white border-y border-outline-variant px-margin py-4 flex justify-between">
-              {days.map((day, i) => (
-                <div 
-                  key={day}
-                  onClick={() => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + (i - d.getDay() + 1));
-                    setSelectedDate(d);
-                  }}
-                  className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-colors cursor-pointer
-                             ${isSameDay(selectedDate, new Date(new Date().setDate(new Date().getDate() + (i - new Date().getDay() + 1)))) ? 'bg-accent text-white shadow-md' : 'text-on-surface-variant'}`}
-                >
-                  <Typography variant="label-sm" className="font-bold">{day}</Typography>
-                </div>
-              ))}
+              {days.map((day, i) => {
+                const d = new Date(selectedDate);
+                const dayOffset = i - (selectedDate.getDay() === 0 ? 6 : selectedDate.getDay() - 1);
+                d.setDate(selectedDate.getDate() + dayOffset);
+                
+                return (
+                  <div 
+                    key={day}
+                    onClick={() => setSelectedDate(new Date(d))}
+                    className={`w-12 h-12 rounded-full flex flex-col items-center justify-center transition-colors cursor-pointer
+                               ${isSameDay(selectedDate, d) ? 'bg-accent text-white shadow-md' : 'text-on-surface-variant'}`}
+                  >
+                    <Typography variant="label-sm" className="font-bold">{day}</Typography>
+                    <Typography variant="body-md" className="font-bold">{format(d, 'd')}</Typography>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Timeline */}
@@ -84,7 +99,7 @@ export default function SchedulePage() {
               ) : error ? (
                 <div className="p-md text-center text-error">{error}</div>
               ) : daySchedule.length > 0 ? (
-                daySchedule.map((item, i) => {
+                daySchedule.map((item) => {
                   const startTime = format(parseISO(item.startTime), 'HH:mm');
                   const now = new Date();
                   const isActive = now >= parseISO(item.startTime) && now <= parseISO(item.endTime);
@@ -126,28 +141,15 @@ export default function SchedulePage() {
             </div>
           </>
         ) : (
-          /* Month View - Keep as static for now as per design */
+          /* Month View using reusable Calendar component */
           <div className="p-margin space-y-lg">
-            <Card variant="elevated" className="bg-white">
-              <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                {['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(d => (
-                  <Typography key={d} variant="label-sm" className="text-on-surface-variant font-bold">{d}</Typography>
-                ))}
-              </div>
-              <div className="grid grid-cols-7 gap-1">
-                {monthPadding.map((_, i) => <div key={`p-${i}`} className="h-10" />)}
-                {monthDays.map(day => (
-                  <div 
-                    key={day} 
-                    className={`h-10 flex flex-col items-center justify-center rounded-lg text-xs font-medium relative
-                               ${day === 10 ? 'bg-primary-container text-white shadow-md' : 'hover:bg-surface-container'}`}
-                  >
-                    {day}
-                    {day % 3 === 0 && <div className="absolute bottom-1 w-1 h-1 rounded-full bg-accent" />}
-                  </div>
-                ))}
-              </div>
-            </Card>
+            <Calendar 
+              currentDate={currentMonth}
+              onMonthChange={setCurrentMonth}
+              onDateClick={handleDateClick}
+              eventDates={eventDates}
+              selectedDate={selectedDate}
+            />
 
             <section className="space-y-md">
               <Typography variant="label-sm" className="font-bold text-on-surface-variant ml-1">KOMMENDE TERMINE</Typography>
