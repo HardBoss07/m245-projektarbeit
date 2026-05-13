@@ -4,30 +4,38 @@ import { use, useState, useMemo } from "react";
 import { MobileShell } from '@/components/organisms/MobileShell';
 import { Typography } from '@/components/atoms/Typography';
 import { Card } from '@/components/atoms/Card';
-import { Icon } from '@/components/atoms/Icon';
+import { Calendar } from '@/components/molecules/Calendar';
 import { useAttendance } from '@/hooks/useAttendance';
-import { format, parseISO, getDate, isSameDay } from 'date-fns';
+import { format, parseISO, isSameDay } from 'date-fns';
 import { de } from 'date-fns/locale';
 
 export default function AbsenceCalendarPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { summary, loading, error } = useAttendance();
   
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
   const classSessions = useMemo(() => summary.filter(s => s.classId === id), [summary, id]);
   const className = classSessions.length > 0 ? classSessions[0].className : "Kalender";
 
-  // Basic calendar logic (simplified for May 2026)
-  const daysInMonth = 31;
-  const startDay = 4; // 0=Mon, ..., 4=Fri
-  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-  const padding = Array.from({ length: startDay }, (_, i) => null);
-
-  const getAbsenceForDay = (day: number) => {
-    return classSessions.find(s => {
-      const date = parseISO(s.sessionDate);
-      return getDate(date) === day && (s.status === 'Offen' || s.status === 'Nicht teilgenommen entschuldigt' || !s.status);
+  const highlights = useMemo(() => {
+    const map: Record<string, 'error' | 'success' | 'primary'> = {};
+    classSessions.forEach(s => {
+      const dateKey = format(parseISO(s.sessionDate), 'yyyy-MM-dd');
+      if (s.status === 'Offen' || !s.status) {
+        map[dateKey] = 'error';
+      } else if (s.status === 'Nicht teilgenommen entschuldigt') {
+        map[dateKey] = 'success';
+      }
     });
-  };
+    return map;
+  }, [classSessions]);
+
+  const selectedAbsence = useMemo(() => {
+    if (!selectedDate) return null;
+    return classSessions.find(s => isSameDay(parseISO(s.sessionDate), selectedDate));
+  }, [selectedDate, classSessions]);
 
   if (loading) return <MobileShell title="Lade..." showBack><div className="p-margin animate-pulse">Lade Kalender...</div></MobileShell>;
 
@@ -46,47 +54,13 @@ export default function AbsenceCalendarPage({ params }: { params: Promise<{ id: 
   return (
     <MobileShell title={`${className} Kalender`} showBack>
       <div className="p-margin flex flex-col gap-lg">
-        {/* Calendar Card */}
-        <Card variant="elevated" className="bg-white">
-          <div className="flex justify-between items-center mb-md">
-            <Typography variant="h2">Mai 2026</Typography>
-            <div className="flex gap-sm">
-              <button className="p-1 hover:bg-surface-container rounded-full transition-colors">
-                <Icon name="chevron_left" />
-              </button>
-              <button className="p-1 hover:bg-surface-container rounded-full transition-colors">
-                <Icon name="chevron_right" />
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-7 gap-1 text-center mb-2">
-            {['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(d => (
-              <Typography key={d} variant="label-sm" className="text-on-surface-variant font-bold">
-                {d}
-              </Typography>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-7 gap-1">
-            {padding.map((_, i) => <div key={`p-${i}`} className="h-10" />)}
-            {days.map(day => {
-              const abs = getAbsenceForDay(day);
-              const isOffen = abs?.status === 'Offen' || !abs?.status;
-              const isEntschuldigt = abs?.status === 'Nicht teilgenommen entschuldigt';
-
-              return (
-                <div 
-                  key={day} 
-                  className={`h-10 flex items-center justify-center rounded-full transition-all text-sm font-medium
-                             ${abs ? (isOffen ? 'bg-error text-white shadow-md' : isEntschuldigt ? 'bg-success text-white shadow-md' : 'bg-primary-container text-white') : 'hover:bg-surface-container'}`}
-                >
-                  {day}
-                </div>
-              );
-            })}
-          </div>
-        </Card>
+        <Calendar 
+          currentDate={currentMonth}
+          onMonthChange={setCurrentMonth}
+          onDateClick={setSelectedDate}
+          highlights={highlights}
+          selectedDate={selectedDate || undefined}
+        />
 
         {/* Legend */}
         <div className="flex gap-lg px-2">
@@ -100,16 +74,28 @@ export default function AbsenceCalendarPage({ params }: { params: Promise<{ id: 
           </div>
         </div>
 
-        {/* Selected Day Info (Static Placeholder) */}
-        <Card variant="glass" className="flex flex-col gap-sm">
-          <Typography variant="label-sm" className="font-bold uppercase tracking-wider text-accent">
-            Details für 4. Mai 2026
-          </Typography>
-          <div className="flex flex-col">
-            <Typography variant="h2">Unentschuldigte Absenz</Typography>
-            <Typography variant="body-md">2 Lektionen • Keine Begründung</Typography>
-          </div>
-        </Card>
+        {/* Selected Day Info */}
+        {selectedDate && (
+          <Card variant="glass" className="flex flex-col gap-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <Typography variant="label-sm" className="font-bold uppercase tracking-wider text-accent">
+              Details für {format(selectedDate, "d. MMMM yyyy", { locale: de })}
+            </Typography>
+            {selectedAbsence ? (
+              <div className="flex flex-col">
+                <Typography variant="h2">
+                  {selectedAbsence.status || 'Unentschuldigte Absenz'}
+                </Typography>
+                <Typography variant="body-md">
+                  {selectedAbsence.requiredLessons} Lektionen • {selectedAbsence.status === 'Nicht teilgenommen entschuldigt' ? 'Entschuldigt' : 'Keine Begründung'}
+                </Typography>
+              </div>
+            ) : (
+              <Typography variant="body-md" className="italic text-on-surface-variant">
+                Keine Absenzen an diesem Tag erfasst.
+              </Typography>
+            )}
+          </Card>
+        )}
       </div>
     </MobileShell>
   );
