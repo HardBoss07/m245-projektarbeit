@@ -137,7 +137,8 @@ CREATE TYPE class_type_enum AS ENUM (
 CREATE TYPE attendance_status_enum AS ENUM (
     'Teilgenommen', 
     'Nicht teilgenommen entschuldigt', 
-    'Offen'
+    'Offen',
+    'Abwesend 100%'
 );
 
 -- Update classes table
