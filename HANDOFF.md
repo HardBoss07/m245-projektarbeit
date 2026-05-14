@@ -1,37 +1,35 @@
-# Handoff: Frontend UI Modernization & Data Integrity
+# Handoff: Attendance/Grade Extraction & Database Integrity
 
 ## Goal
 
-The primary goal was to enhance the application's UX through a reusable, interactive `Calendar` molecule for timetable and absence management, refactor the `Grades` screen to support an expandable, categorized data view, and generate a comprehensive, strictly valid example dataset to support end-to-end testing and performance demonstration.
+The primary goal was to process high-fidelity student data from screenshots, establishing a robust and relational database foundation. This included extracting attendance and grade records, resolving critical foreign key and cascading failures in the backend initialization, and orchestrating a deterministic startup sequence for the database environment.
 
 ## Current State
 
-- **Calendar Integration**: Implemented a reusable `Calendar` molecule (`frontend/components/molecules/Calendar.tsx`) supporting dynamic month navigation, date selection, and status-based highlighting (errors for open absences, success for excused). Integrated this into `SchedulePage` and the absence detail views.
-- **Grades Refactor**: Unified the data source for Grades across the app using a singular `useGrades` hook and refined the `Grade` interface. Implemented a grouped, accordion-style view in the Grades screen, allowing users to drill down into specific exam weights (ZP vs. LB).
-- **Example Data**: Generated a large-scale, high-volume `example_data.sql` script.
-  - Strictly consumed UUIDs from `v4_uuids.txt` to ensure relational integrity.
-  - Populated data for 30 students, 3 classes, and 30 sessions, including full attendance and grade records.
-  - Ensured adherence to business logic (4.0-lesson half-day sessions, 10-session schedule, and correct exam weightings).
-- **Type Safety**: Fixed a build-time TypeScript error in the `Badge` component by adding support for the `outline` variant.
+- **Attendance Data Extraction**: Processed 22 student attendance screenshots for Matteo Bosshard. Extracted session dates, required/attended lessons, and statuses, mapping them to the `attendance_records` schema.
+- **Grades Data Extraction**: Processed 13 student grade screenshots. Extracted exam results, weights, and categories, mapping them to the `exam_results` and `exams` schema.
+- **Relational Integrity Fixes**: 
+  - Rewrote seed scripts (`attendance_seed.sql`, `grades_seed.sql`) to enforce strict dependency chains.
+  - Implemented a phase-based initialization (Subjects -> Events -> Exams -> Results) in `grades_seed.sql` with defensive error handling (RAISE EXCEPTION on missing dependencies).
+  - Added an enrollment block to `attendance_seed.sql` ensuring the student is properly enrolled in all extracted modules.
+- **Database Orchestration**: Updated `docker-compose.yml` to force a strict execution order (001_schema -> 002_example_data -> 003_attendance_seed -> 004_grades_seed) using file renaming/prefixes, ensuring a valid and complete state on every fresh startup.
 
 ## Files Actively Involved
 
-- `frontend/components/molecules/Calendar.tsx`: New reusable calendar component.
-- `frontend/app/schedule/page.tsx`: Integrated new calendar.
-- `frontend/app/absences/page.tsx`: Added calendar view toggle.
-- `frontend/app/grades/page.tsx`: Grouped, expandable grades list.
-- `database/example_data.sql`: High-volume populated dataset.
-- `v4_uuids.txt`: Source for UUID consumption.
+- `database/attendance_seed.sql`: New attendance records and enrollment logic.
+- `database/grades_seed.sql`: New grade records with strict relational validation.
+- `database/example_data.sql`: Cleaned foundational user and system data.
+- `docker-compose.yml`: Updated initialization order for seed files.
 
 ## Investigation History & Learnings
 
-- **Data Consistency**: Identified discrepancies in grade data presentation. Solved by aligning frontend `Grade` interface with backend types and centralized hook usage.
-- **Constraint Handling**: Generating valid SQL for PostgreSQL required careful mapping of foreign keys using the provided UUID list, ensuring no orphans or FK violations.
-- **Typing**: Encountered build errors when introducing new UI variations (Badges). Resolved by hardening component types.
+- **Relational Chain Failure**: Backend joins were failing due to orphans (empty `class_enrollments` and missing `events`/`subjects`). Solved by programmatically enforcing the insertion of subject/event associations before grade/exam records.
+- **Silent Failures**: The previous seed logic allowed invalid data to persist if lookups failed. Resolved by adding explicit exception raising within PL/pgSQL blocks to ensure failures occur at build time, not runtime.
+- **Initialization Order**: Postgres container startup order was non-deterministic for our dependencies. Resolved via numerical prefixing of files in `/docker-entrypoint-initdb.d/`.
 
 ## Next Steps
 
-1. **Verify Integration**: Perform end-to-end testing of the new calendar interactivity with the live backend endpoints.
-2. **Performance Audit**: Utilize the high-volume dataset to audit list performance and pagination implementation.
-3. **SSE Implementation**: Move to Phase 5 of the backend roadmap: implementing Server-Sent Events (SSE) for real-time notifications on grade updates.
-4. **Final Polish**: Run a lint/type-check pass across the whole workspace to ensure complete consistency following the recent refactoring.
+1. **Verify Integration**: Execute `docker compose up` to validate the new orchestrated initialization sequence.
+2. **Backend Validation**: Ensure the backend's `INNER JOIN` logic now returns complete arrays for attendance and grade queries.
+3. **Frontend Integration**: Update frontend components to consume the now-complete relational dataset.
+4. **Final Audit**: Conduct a final linting pass and verification of the database health check.
