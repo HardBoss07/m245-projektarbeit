@@ -49,11 +49,11 @@ services:
       retries: 5
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql
-      - ./database/example_data.sql:/docker-entrypoint-initdb.d/002_example_data.sql
-      - ./database/attendance_seed.sql:/docker-entrypoint-initdb.d/003_attendance_seed.sql
-      - ./database/grades_seed.sql:/docker-entrypoint-initdb.d/004_grades_seed.sql
-      - ./database/timetable_seed.sql:/docker-entrypoint-initdb.d/005_timetable_seed.sql
+      - ./database/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql
+      - ./database/002_example_data.sql:/docker-entrypoint-initdb.d/002_example_data.sql
+      - ./database/003_timetable_seed.sql:/docker-entrypoint-initdb.d/003_timetable_seed.sql
+      - ./database/004_attendance_seed.sql:/docker-entrypoint-initdb.d/004_attendance_seed.sql
+      - ./database/005_grades_seed.sql:/docker-entrypoint-initdb.d/005_grades_seed.sql
     networks:
       - wiss-network
 
