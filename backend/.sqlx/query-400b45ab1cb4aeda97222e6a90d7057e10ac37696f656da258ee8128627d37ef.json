@@ -33,7 +33,9 @@
               "Enum": [
                 "Teilgenommen",
                 "Nicht teilgenommen entschuldigt",
-                "Offen"
+                "Offen",
+                "Abwesend 100%",
+                "Nicht teilgenommen unentschuldigt"
               ]
             }
           }
