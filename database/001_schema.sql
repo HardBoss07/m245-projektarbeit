@@ -138,6 +138,7 @@ CREATE TYPE class_type_enum AS ENUM (
 CREATE TYPE attendance_status_enum AS ENUM (
     'Teilgenommen', 
     'Nicht teilgenommen entschuldigt', 
+    'Nicht teilgenommen unentschuldigt',
     'Offen',
     'Abwesend 100%'
 );
@@ -153,8 +154,10 @@ ADD COLUMN min_attendance_pct NUMERIC(5, 2) DEFAULT 90.00;
 CREATE TABLE class_sessions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     class_id UUID NOT NULL REFERENCES classes(id) ON DELETE CASCADE,
+    event_id UUID REFERENCES events(id) ON DELETE CASCADE,
     session_date TIMESTAMP WITH TIME ZONE NOT NULL,
-    required_lessons NUMERIC(5, 2) NOT NULL
+    required_lessons NUMERIC(5, 2) NOT NULL,
+    UNIQUE(class_id, event_id, session_date)
 );
 
 -- Create attendance_records table
