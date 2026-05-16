@@ -1,455 +1,322 @@
--- Attendance Seed Data
--- Extracted from reference screenshots
-
--- 1. Update Enum with missing values
-ALTER TYPE attendance_status_enum ADD VALUE IF NOT EXISTS 'Abwesend 100%';
-ALTER TYPE attendance_status_enum ADD VALUE IF NOT EXISTS 'Nicht teilgenommen unentschuldigt';
-
 BEGIN;
 
--- 2. Ensure classes exist
-INSERT INTO classes (id, designation, short_name, class_type) VALUES
-(gen_random_uuid(), '114 - Codierungs-, Kompressions- und Verschlüsselungsverfahren einsetzen', 'M114', 'Modul'),
-(gen_random_uuid(), '117 - Informatik- und Netzinfrastruktur für ein kleines Unternehmen realisieren', 'M117', 'Modul'),
-(gen_random_uuid(), '122 - Abläufe mit einer Scriptsprache automatisieren', 'M122', 'Modul'),
-(gen_random_uuid(), '162 - Daten analysieren und modellieren', 'M162', 'Modul'),
-(gen_random_uuid(), '164 - Datenbanken erstellen und Daten einfügen', 'M164', 'Modul'),
-(gen_random_uuid(), '187 - ICT-Arbeitsplatz mit Betriebssystem in Betrieb nehmen', 'M187', 'GE Modul'),
-(gen_random_uuid(), '231 - Datenschutz und Datensicherheit anwenden', 'M231', 'Modul'),
-(gen_random_uuid(), '241 - Innovative ICT-Lösungen initialisieren', 'M241', 'Modul'),
-(gen_random_uuid(), '245 - Innovative ICT-Lösungen umsetzen', 'M245', 'Modul'),
-(gen_random_uuid(), '254 - Geschäftsprozesse im eigenen Berufsumfeld beschreiben', 'M254', 'Modul'),
-(gen_random_uuid(), '306 - Kleinprojekte im eigenen Berufsumfeld abwickeln', 'M306', 'Modul'),
-(gen_random_uuid(), '319 - Applikationen entwerfen und implementieren', 'M319', 'Modul'),
-(gen_random_uuid(), '346 - Cloud Lösungen konzipieren und realisieren', 'M346', 'Modul'),
-(gen_random_uuid(), '431 - Aufträge im eigenen Berufsumfeld selbstständig durchführen', 'M431', 'Modul'),
-(gen_random_uuid(), 'Sport Semester 1', 'Sport S1', 'Semester'),
-(gen_random_uuid(), 'Allgemeinbildung Semester 1', 'ABU S1', 'Semester'),
-(gen_random_uuid(), 'Allgemeinbildung Semester 2', 'ABU S2', 'Semester'),
-(gen_random_uuid(), 'Office Werkzeuge anwenden', 'Office', 'GE Modul'),
-(gen_random_uuid(), '106 - Datenbanken abfragen, bearbeiten und warten', 'M106', 'Modul'),
-(gen_random_uuid(), 'Englisch Niveau 3 Semester 1', 'ENG S1', 'Semester'),
-(gen_random_uuid(), 'Englisch Niveau 3 Semester 2', 'ENG S2', 'Semester'),
-(gen_random_uuid(), 'Mathematik Semester 2', 'MAT S2', 'Semester')
-ON CONFLICT (designation) DO NOTHING;
+-- ==========================================
+-- 1. ATTENDANCE DATA (1-to-1 Mapping)
+-- ==========================================
 
--- 3. Student ID subquery helper
--- We'll use (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch')
-
--- 4. Attendance Records
-
--- Batch 1: 114 - Codierungs- ...
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '114 - Codierungs-, Kompressions- und Verschlüsselungsverfahren einsetzen');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..4 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-11-12'::date + (d * 7) + '08:30:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-11-12'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    END LOOP;
-END $$;
-
--- Batch 2: 117 - Informatik- ...
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '117 - Informatik- und Netzinfrastruktur für ein kleines Unternehmen realisieren');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..10 LOOP
-        IF d != 7 THEN -- Skip one week (Autumn break?)
-            INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-08-21'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-        END IF;
-    END LOOP;
-END $$;
-
--- Batch 3: 122 - Abläufe ...
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '122 - Abläufe mit einer Scriptsprache automatisieren');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    -- 2025 dates
-    INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-12-17 08:30:00+01', 4.0) RETURNING id INTO sess_id;
-    INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-12-17 13:00:00+01', 4.0) RETURNING id INTO sess_id;
-    INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    -- 2026 dates
-    FOR d IN 0..3 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-01-07'::date + (d * 7) + '08:30:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-01-07'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    END LOOP;
-END $$;
-
--- Batch 4: 162 - Daten analysieren ...
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '162 - Daten analysieren und modellieren');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..10 LOOP
-        IF d != 10 THEN -- 2025
-            INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-10-27'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-        ELSE -- 2026
-            INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-01-05 13:00:00+01', 4.0) RETURNING id INTO sess_id;
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-            INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-01-12 13:00:00+01', 4.0) RETURNING id INTO sess_id;
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-        END IF;
-    END LOOP;
-END $$;
-
--- Batch 5: 164 - Datenbanken erstellen ...
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '164 - Datenbanken erstellen und Daten einfügen');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..10 LOOP
-        sess_id := gen_random_uuid();
-        INSERT INTO class_sessions (id, class_id, session_date, required_lessons) 
-        VALUES (sess_id, cid, '2025-11-13'::date + (d * 7) + '13:00:00'::time, 4.0);
-        
-        IF d = 1 OR d = 4 THEN
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Nicht teilgenommen entschuldigt');
-        ELSE
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-        END IF;
-    END LOOP;
-END $$;
-
--- Batch 6: 187 - ICT-Arbeitsplatz ...
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '187 - ICT-Arbeitsplatz mit Betriebssystem in Betrieb nehmen');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..4 LOOP
-        -- Morning
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-08-20'::date + (d * 7) + '08:30:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-        -- Afternoon
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-08-20'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    END LOOP;
-END $$;
-
--- Batch 7: 231 - Datenschutz ...
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '231 - Datenschutz und Datensicherheit anwenden');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..10 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-10-28'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-        IF d = 3 THEN
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Nicht teilgenommen entschuldigt');
-        ELSE
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-        END IF;
-    END LOOP;
-END $$;
-
--- Batch 8: 254 - Geschäftsprozesse ...
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '254 - Geschäftsprozesse im eigenen Berufsumfeld beschreiben');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-04-13 13:00:00+02', 4.0) RETURNING id INTO sess_id;
-    INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-05-04 13:00:00+02', 4.0) RETURNING id INTO sess_id;
-    INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-05-11 13:00:00+02', 4.0) RETURNING id INTO sess_id;
-    INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Abwesend 100%');
-END $$;
-
--- Batch 9: Sport Semester 1
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = 'Sport Semester 1');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..12 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-08-26'::date + (d * 14) + '08:20:00'::time, 2.0) RETURNING id INTO sess_id;
-        IF d = 4 OR d = 6 OR d = 11 THEN
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Nicht teilgenommen entschuldigt');
-        ELSE
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 2.0, 'Teilgenommen');
-        END IF;
-    END LOOP;
-END $$;
-
--- Batch 10: 431 - Aufträge im eigenen Berufsumfeld selbstständig durchführen
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '431 - Aufträge im eigenen Berufsumfeld selbstständig durchführen');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..5 LOOP
-        -- Morning
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-08-25'::date + (d * 7) + '08:30:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-        -- Afternoon
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-08-25'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    END LOOP;
-    -- Extra session Oct 1
-    INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-10-01 08:30:00+02', 4.0) RETURNING id INTO sess_id;
-    INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-10-01 13:00:00+02', 4.0) RETURNING id INTO sess_id;
-    INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-END $$;
-
--- Batch 11: Allgemeinbildung Semester 1
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = 'Allgemeinbildung Semester 1');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..20 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-08-22'::date + (d * 7) + '10:30:00'::time, 2.0) RETURNING id INTO sess_id;
-        IF d = 2 OR d = 9 THEN
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Nicht teilgenommen entschuldigt');
-        ELSIF d = 21 THEN
-             INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Offen');
-        ELSE
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 2.0, 'Teilgenommen');
-        END IF;
-    END LOOP;
-END $$;
-
--- Batch 12: Office Werkzeuge anwenden
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = 'Office Werkzeuge anwenden');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..6 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-08-21'::date + (d * 7) + '08:30:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    END LOOP;
-END $$;
-
--- Batch 13: 106 - Datenbanken abfragen, bearbeiten und warten
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '106 - Datenbanken abfragen, bearbeiten und warten');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..4 LOOP
-        -- Morning
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-03-02'::date + (d * 7) + '08:30:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-        -- Afternoon
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-03-02'::date + (d * 7) + '13:00:00'::time, 5.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 5.0, 'Teilgenommen');
-    END LOOP;
-END $$;
-
--- Batch 14: 241 - Innovative ICT-Lösungen initialisieren
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '241 - Innovative ICT-Lösungen initialisieren');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..8 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-02-19'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    END LOOP;
-    -- Extra 16. April sessions
-    INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-04-16 08:30:00+02', 4.0) RETURNING id INTO sess_id;
-    INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-04-16 13:00:00+02', 4.0) RETURNING id INTO sess_id;
-    INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-END $$;
-
--- Batch 15: 245 - Innovative ICT-Lösungen umsetzen
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '245 - Innovative ICT-Lösungen umsetzen');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-05-07 13:00:00+02', 4.0) RETURNING id INTO sess_id;
-    INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    FOR d IN 1..10 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-05-07'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Offen');
-    END LOOP;
-END $$;
-
--- Batch 16: 306 - Kleinprojekte im eigenen Berufsumfeld abwickeln
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '306 - Kleinprojekte im eigenen Berufsumfeld abwickeln');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..4 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-03-31'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    END LOOP;
-    FOR d IN 5..9 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-03-31'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Offen');
-    END LOOP;
-END $$;
-
--- Batch 17: 319 - Applikationen entwerfen und implementieren
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '319 - Applikationen entwerfen und implementieren');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..4 LOOP
-        IF d = 2 THEN -- March 4th
-            INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-03-04 08:30:00+01', 4.0) RETURNING id INTO sess_id;
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Nicht teilgenommen entschuldigt');
-            INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-03-04 13:00:00+01', 4.0) RETURNING id INTO sess_id;
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Nicht teilgenommen entschuldigt');
-        ELSIF d = 3 THEN -- March 11th
-            INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-03-11 08:30:00+01', 4.0) RETURNING id INTO sess_id;
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-            INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-03-11 13:00:00+01', 4.0) RETURNING id INTO sess_id;
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Nicht teilgenommen entschuldigt');
-        ELSE
-            INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-02-18'::date + (d * 7) + '08:30:00'::time, 4.0) RETURNING id INTO sess_id;
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-            INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-02-18'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-        END IF;
-    END LOOP;
-END $$;
-
--- Batch 18: 346 - Cloud Lösungen konzipieren und realisieren
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = '346 - Cloud Lösungen konzipieren und realisieren');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..4 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-04-01'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-    END LOOP;
-    FOR d IN 5..10 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-04-01'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Offen');
-    END LOOP;
-END $$;
-
--- Batch 19: Allgemeinbildung Semester 2
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = 'Allgemeinbildung Semester 2');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..8 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-02-20'::date + (d * 7) + '10:30:00'::time, 2.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 2.0, 'Teilgenommen');
-    END LOOP;
-    FOR d IN 9..20 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-02-20'::date + (d * 7) + '10:30:00'::time, 2.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Offen');
-    END LOOP;
-END $$;
-
--- Batch 20: Mathematik Semester 2
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = 'Mathematik Semester 2');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..8 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-02-20'::date + (d * 7) + '13:00:00'::time, 2.0) RETURNING id INTO sess_id;
-        IF d = 3 OR d = 5 THEN
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Nicht teilgenommen entschuldigt');
-        ELSE
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 2.0, 'Teilgenommen');
-        END IF;
-    END LOOP;
-    FOR d IN 9..20 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-02-20'::date + (d * 7) + '13:00:00'::time, 2.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Offen');
-    END LOOP;
-END $$;
-
--- Batch 21: Englisch Niveau 3 Semester 2
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = 'Englisch Niveau 3 Semester 2');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..8 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-02-20'::date + (d * 7) + '15:00:00'::time, 2.0) RETURNING id INTO sess_id;
-        IF d = 3 OR d = 4 OR d = 5 THEN
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Nicht teilgenommen entschuldigt');
-        ELSE
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 2.0, 'Teilgenommen');
-        END IF;
-    END LOOP;
-    FOR d IN 9..20 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2026-02-20'::date + (d * 7) + '15:00:00'::time, 2.0) RETURNING id INTO sess_id;
-        INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Offen');
-    END LOOP;
-END $$;
-
--- Batch 22: Englisch Niveau 3 Semester 1
-DO $$
-DECLARE
-    cid UUID := (SELECT id FROM classes WHERE designation = 'Englisch Niveau 3 Semester 1');
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-    sess_id UUID;
-BEGIN
-    FOR d IN 0..22 LOOP
-        INSERT INTO class_sessions (class_id, session_date, required_lessons) VALUES (cid, '2025-08-22'::date + (d * 7) + '13:00:00'::time, 4.0) RETURNING id INTO sess_id;
-        IF d = 2 OR d = 4 OR d = 11 OR d = 19 OR d = 21 THEN
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Nicht teilgenommen entschuldigt');
-        ELSIF d = 17 OR d = 20 THEN
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 0.0, 'Nicht teilgenommen unentschuldigt');
-        ELSE
-            INSERT INTO attendance_records (session_id, student_id, attended_lessons, status) VALUES (sess_id, sid, 4.0, 'Teilgenommen');
-        END IF;
-    END LOOP;
-END $$;
-
--- 5. Enroll Student in all classes (CRITICAL FIX)
-DO $$
-DECLARE
-    sid UUID := (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch');
-BEGIN
-    IF sid IS NULL THEN
-        RAISE EXCEPTION 'User matteo.bosshard@wiss-edu.ch not found. Base data cleanup might have failed.';
-    END IF;
-
-    INSERT INTO class_enrollments (user_id, class_id)
-    SELECT sid, id FROM classes
-    ON CONFLICT DO NOTHING;
-END $$;
+WITH raw_attendance (sc, st, soll, ist, status) AS (
+    VALUES
+    -- 164
+    ('164', '2025-11-13 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('164', '2025-11-14 13:00:00+02', 4.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('164', '2025-11-15 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('164', '2025-12-16 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('164', '2025-12-17 13:00:00+02', 4.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('164', '2025-12-18 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('164', '2026-01-19 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('164', '2026-01-20 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('164', '2026-01-21 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('164', '2026-01-22 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    -- 114
+    ('114', '2025-11-12 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('114', '2025-11-12 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('114', '2025-11-19 08:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('114', '2025-11-19 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('114', '2025-11-26 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('114', '2025-11-26 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('114', '2025-12-03 08:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('114', '2025-12-03 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('114', '2025-12-10 08:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('114', '2025-12-10 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    -- 117
+    ('117', '2025-08-21 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('117', '2025-08-28 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('117', '2025-09-04 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('117', '2025-09-11 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('117', '2025-09-18 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('117', '2025-09-25 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('117', '2025-10-02 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('117', '2025-10-23 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('117', '2025-10-30 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('117', '2025-11-06 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    -- 122
+    ('122', '2025-12-17 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('122', '2025-12-17 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('122', '2026-01-07 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('122', '2026-01-07 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('122', '2026-01-14 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('122', '2026-01-14 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('122', '2026-01-21 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('122', '2026-01-21 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('122', '2026-01-28 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('122', '2026-01-28 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    -- 162
+    ('162', '2025-10-27 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('162', '2025-11-03 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('162', '2025-11-10 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('162', '2025-11-17 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('162', '2025-11-24 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('162', '2025-12-01 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('162', '2025-12-08 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('162', '2025-12-15 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('162', '2026-01-05 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('162', '2026-01-12 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    -- 187
+    ('187', '2025-08-20 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('187', '2025-08-27 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('187', '2025-09-03 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('187', '2025-09-10 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('187', '2025-09-17 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('187', '2025-08-20 13:00:00+02', 5.0, 5.0, 'Teilgenommen'),
+    ('187', '2025-08-27 13:00:00+02', 5.0, 5.0, 'Teilgenommen'),
+    ('187', '2025-09-03 13:00:00+02', 5.0, 5.0, 'Teilgenommen'),
+    ('187', '2025-09-10 13:00:00+02', 5.0, 5.0, 'Teilgenommen'),
+    ('187', '2025-09-17 13:00:00+02', 5.0, 5.0, 'Teilgenommen'),
+    -- 231
+    ('231', '2025-10-28 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('231', '2025-11-04 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('231', '2025-11-11 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('231', '2025-11-18 13:00:00+02', 4.0, 0.0, 'Teilgenommen'),
+    ('231', '2025-11-25 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('231', '2025-12-02 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('231', '2025-12-09 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('231', '2025-12-16 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('231', '2026-01-06 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('231', '2026-01-13 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    -- 431
+    ('431', '2025-08-25 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('431', '2025-08-25 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('431', '2025-09-01 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('431', '2025-09-01 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('431', '2025-09-22 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('431', '2025-09-22 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('431', '2025-09-29 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('431', '2025-09-29 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('431', '2025-10-01 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('431', '2025-10-01 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    -- AB1
+    ('AB1', '2025-08-22 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2025-08-29 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2025-09-05 10:30:00+02', 2.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('AB1', '2025-09-12 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2025-09-19 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2025-09-26 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2025-09-30 13:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2025-10-24 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2025-10-31 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2025-11-07 10:30:00+02', 2.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('AB1', '2025-11-14 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2025-11-21 10:30:00+02', 2.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('AB1', '2025-11-28 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2025-12-05 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2025-12-12 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2025-12-19 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2026-01-09 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2026-01-16 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB1', '2026-01-23 10:30:00+02', 2.0, 0.0, 'Offen'),
+    ('AB1', '2026-01-30 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    -- SP1
+    ('SP1', '2025-08-26 08:20:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('SP1', '2025-09-09 08:20:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('SP1', '2025-09-23 08:20:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('SP1', '2025-09-30 09:00:00+02', 3.0, 3.0, 'Teilgenommen'),
+    ('SP1', '2025-10-21 08:20:00+02', 2.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('SP1', '2025-11-04 08:20:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('SP1', '2025-11-18 08:20:00+02', 2.0, 0.0, 'Nicht teilgenommen unentschuldigt'),
+    ('SP1', '2025-12-02 08:20:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('SP1', '2025-12-16 09:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('SP1', '2026-01-13 08:20:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('SP1', '2026-01-27 08:20:00+02', 2.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    -- OFF
+    ('OFF', '2025-08-21 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('OFF', '2025-08-28 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('OFF', '2025-09-04 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('OFF', '2025-09-11 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('OFF', '2025-09-18 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('OFF', '2025-09-25 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('OFF', '2025-10-02 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    -- 106
+    ('106', '2026-03-02 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('106', '2026-03-02 13:00:00+02', 5.0, 5.0, 'Teilgenommen'),
+    ('106', '2026-03-09 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('106', '2026-03-09 13:00:00+02', 5.0, 5.0, 'Teilgenommen'),
+    ('106', '2026-03-16 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('106', '2026-03-16 13:00:00+02', 5.0, 5.0, 'Teilgenommen'),
+    ('106', '2026-03-23 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('106', '2026-03-23 13:00:00+02', 5.0, 5.0, 'Teilgenommen'),
+    ('106', '2026-03-30 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('106', '2026-03-30 13:00:00+02', 5.0, 5.0, 'Teilgenommen'),
+    -- 241
+    ('241', '2026-02-19 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('241', '2026-02-26 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('241', '2026-03-05 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('241', '2026-03-12 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('241', '2026-03-19 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('241', '2026-03-26 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('241', '2026-04-02 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('241', '2026-04-09 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('241', '2026-04-16 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('241', '2026-04-16 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    -- 245
+    ('245', '2026-05-07 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('245', '2026-05-21 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('245', '2026-05-28 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('245', '2026-06-04 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('245', '2026-06-11 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('245', '2026-06-18 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('245', '2026-06-25 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('245', '2026-07-02 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('245', '2026-07-09 08:30:00+02', 4.0, 0.0, 'Offen'),
+    ('245', '2026-07-09 13:00:00+02', 4.0, 0.0, 'Offen'),
+    -- EN2
+    ('EN2', '2026-02-20 15:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('EN2', '2026-02-27 15:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('EN2', '2026-03-06 15:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('EN2', '2026-03-13 15:00:00+02', 2.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('EN2', '2026-03-20 15:00:00+02', 2.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('EN2', '2026-03-27 15:00:00+02', 2.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('EN2', '2026-04-10 15:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('EN2', '2026-04-17 15:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('EN2', '2026-05-08 15:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('EN2', '2026-05-15 15:00:00+02', 2.0, 0.0, 'Offen'),
+    ('EN2', '2026-05-22 15:00:00+02', 2.0, 0.0, 'Offen'),
+    ('EN2', '2026-05-29 15:00:00+02', 2.0, 0.0, 'Offen'),
+    ('EN2', '2026-06-05 15:00:00+02', 2.0, 0.0, 'Offen'),
+    ('EN2', '2026-06-12 15:00:00+02', 2.0, 0.0, 'Offen'),
+    ('EN2', '2026-06-19 15:00:00+02', 2.0, 0.0, 'Offen'),
+    ('EN2', '2026-06-26 15:00:00+02', 2.0, 0.0, 'Offen'),
+    ('EN2', '2026-07-03 15:00:00+02', 2.0, 0.0, 'Offen'),
+    ('EN2', '2026-07-10 15:00:00+02', 2.0, 0.0, 'Offen'),
+    -- 254
+    ('254', '2026-04-13 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('254', '2026-05-04 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('254', '2026-05-11 13:00:00+02', 4.0, 0.0, 'Abwesend 100%'),
+    ('254', '2026-05-18 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('254', '2026-06-01 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('254', '2026-06-08 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('254', '2026-06-15 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('254', '2026-06-22 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('254', '2026-06-29 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('254', '2026-07-06 13:00:00+02', 4.0, 0.0, 'Offen'),
+    -- 306
+    ('306', '2026-03-31 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('306', '2026-04-07 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('306', '2026-04-14 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('306', '2026-05-05 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('306', '2026-05-12 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('306', '2026-05-19 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('306', '2026-05-26 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('306', '2026-06-02 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('306', '2026-06-09 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('306', '2026-06-16 13:00:00+02', 4.0, 0.0, 'Offen'),
+    -- 319
+    ('319', '2026-02-18 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('319', '2026-02-18 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('319', '2026-02-25 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('319', '2026-02-25 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('319', '2026-03-04 08:30:00+02', 4.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('319', '2026-03-04 13:00:00+02', 4.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('319', '2026-03-11 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('319', '2026-03-11 13:00:00+02', 4.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('319', '2026-03-18 08:30:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('319', '2026-03-18 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    -- 346
+    ('346', '2026-04-01 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('346', '2026-04-08 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('346', '2026-04-15 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('346', '2026-05-06 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('346', '2026-05-13 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('346', '2026-05-20 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('346', '2026-05-27 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('346', '2026-06-03 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('346', '2026-06-10 13:00:00+02', 4.0, 0.0, 'Offen'),
+    ('346', '2026-06-17 13:00:00+02', 4.0, 0.0, 'Offen'),
+    -- AB2
+    ('AB2', '2026-02-20 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB2', '2026-02-27 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB2', '2026-03-06 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB2', '2026-03-13 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB2', '2026-03-20 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB2', '2026-03-27 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB2', '2026-04-10 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB2', '2026-04-15 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB2', '2026-05-08 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('AB2', '2026-05-06 09:00:00+02', 2.0, 0.0, 'Offen'),
+    ('AB2', '2026-05-22 10:30:00+02', 2.0, 0.0, 'Offen'),
+    ('AB2', '2026-05-29 10:30:00+02', 2.0, 0.0, 'Offen'),
+    ('AB2', '2026-06-05 10:30:00+02', 2.0, 0.0, 'Offen'),
+    ('AB2', '2026-06-12 10:30:00+02', 2.0, 0.0, 'Offen'),
+    ('AB2', '2026-06-19 10:30:00+02', 2.0, 0.0, 'Offen'),
+    ('AB2', '2026-06-26 10:30:00+02', 2.0, 0.0, 'Offen'),
+    ('AB2', '2026-07-03 10:30:00+02', 2.0, 0.0, 'Offen'),
+    ('AB2', '2026-07-10 10:30:00+02', 2.0, 0.0, 'Offen'),
+    ('AB2', '2026-04-01 10:30:00+02', 2.0, 2.0, 'Teilgenommen'),
+    -- MA2
+    ('MA2', '2026-02-20 13:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('MA2', '2026-02-27 13:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('MA2', '2026-03-06 13:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('MA2', '2026-03-13 13:00:00+02', 2.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('MA2', '2026-03-20 13:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('MA2', '2026-03-27 13:00:00+02', 2.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('MA2', '2026-04-10 13:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('MA2', '2026-04-17 13:00:00+02', 2.0, 2.0, 'Teilgenommen'),
+    ('MA2', '2026-05-08 13:00:00+02', 2.0, 0.0, 'Offen'),
+    ('MA2', '2026-05-15 13:00:00+02', 2.0, 0.0, 'Offen'),
+    ('MA2', '2026-05-22 13:00:00+02', 2.0, 0.0, 'Offen'),
+    ('MA2', '2026-05-29 13:00:00+02', 2.0, 0.0, 'Offen'),
+    ('MA2', '2026-06-05 13:00:00+02', 2.0, 0.0, 'Offen'),
+    ('MA2', '2026-06-12 13:00:00+02', 2.0, 0.0, 'Offen'),
+    ('MA2', '2026-06-19 13:00:00+02', 2.0, 0.0, 'Offen'),
+    ('MA2', '2026-06-26 13:00:00+02', 2.0, 0.0, 'Offen'),
+    ('MA2', '2026-07-03 13:00:00+02', 2.0, 0.0, 'Offen'),
+    ('MA2', '2026-07-10 13:00:00+02', 2.0, 0.0, 'Offen'),
+    -- EN1
+    ('EN1', '2025-08-22 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2025-08-29 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2025-09-05 13:00:00+02', 4.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('EN1', '2025-09-12 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2025-09-19 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2025-09-26 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2025-10-03 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2025-10-24 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2025-10-31 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2025-11-07 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2025-11-14 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2025-11-21 13:00:00+02', 4.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('EN1', '2025-11-28 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2025-12-05 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2025-12-12 13:00:00+02', 4.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('EN1', '2025-12-19 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2026-01-09 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2026-01-16 13:00:00+02', 4.0, 0.0, 'Nicht teilgenommen entschuldigt'),
+    ('EN1', '2026-01-23 13:00:00+02', 4.0, 4.0, 'Teilgenommen'),
+    ('EN1', '2026-01-30 13:00:00+02', 4.0, 4.0, 'Teilgenommen')
+),
+inserted_class_sessions AS (
+    INSERT INTO class_sessions (class_id, event_id, session_date, required_lessons)
+    SELECT c.id, e.id, d.st::timestamptz, d.soll
+    FROM raw_attendance d
+    JOIN subjects sub ON d.sc = sub.code
+    JOIN events e ON sub.id = e.subject_id
+    JOIN classes c ON e.class_id = c.id
+    RETURNING id, event_id, session_date
+)
+INSERT INTO attendance_records (session_id, student_id, attended_lessons, status)
+SELECT 
+    cs.id, 
+    (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch'), 
+    d.ist, 
+    d.status::attendance_status_enum
+FROM inserted_class_sessions cs
+JOIN events e ON cs.event_id = e.id
+JOIN subjects s ON e.subject_id = s.id
+JOIN raw_attendance d ON s.code = d.sc AND cs.session_date = d.st::timestamptz;
+-- ==========================================
+-- 2. ENROLL STUDENT IN ALL CLASSES
+-- ==========================================
+INSERT INTO class_enrollments (user_id, class_id)
+SELECT (SELECT id FROM users WHERE email = 'matteo.bosshard@wiss-edu.ch'), id
+FROM classes
+ON CONFLICT DO NOTHING;
 
 COMMIT;
