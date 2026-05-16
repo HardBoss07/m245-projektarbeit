@@ -11,6 +11,10 @@ pub enum AttendanceStatus {
     #[sqlx(rename = "Nicht teilgenommen entschuldigt")]
     NichtTeilgenommenEntschuldigt,
     Offen,
+    #[sqlx(rename = "Abwesend 100%")]
+    Abwesend100,
+    #[sqlx(rename = "Nicht teilgenommen unentschuldigt")]
+    NichtTeilgenommenUnentschuldigt,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]

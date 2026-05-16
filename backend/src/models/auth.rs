@@ -9,6 +9,7 @@ pub struct RefreshToken {
     pub family_id: uuid::Uuid,
     pub is_revoked: bool,
     pub expires_at: chrono::DateTime<chrono::Utc>,
+    pub created_at: chrono::DateTime<chrono::Utc>,
     pub rotated_at: Option<chrono::DateTime<chrono::Utc>>,
 }
 

@@ -8,6 +8,7 @@ pub mod absenzen;
 pub mod auth;
 pub mod grades;
 pub mod pagination;
+pub mod types;
 
 pub use pagination::Pagination;
 
