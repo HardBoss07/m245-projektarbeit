@@ -1,15 +1,15 @@
 import { fetchClient } from '@/lib/fetchClient';
-import { User, UpdateUserRequest } from '@/types/api';
+import { UserResponse, UpdateUserPayload } from '@/types/models';
 
 export const userService = {
-  async getMe(): Promise<User> {
-    return fetchClient<User>('/users/me');
+  async getMe(): Promise<UserResponse> {
+    return fetchClient<UserResponse>('/users/me');
   },
 
-  async updateMe(data: UpdateUserRequest): Promise<User> {
-    return fetchClient<User>('/users/me', {
+  async updateMe(payload: UpdateUserPayload): Promise<UserResponse> {
+    return fetchClient<UserResponse>('/users/me', {
       method: 'PATCH',
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
   },
 };

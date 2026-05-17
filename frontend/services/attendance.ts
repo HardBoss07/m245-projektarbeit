@@ -1,12 +1,12 @@
 import { fetchClient } from '@/lib/fetchClient';
-import { AttendanceSummary, AttendanceDetail } from '@/types/api';
+import { ClassAttendance, AttendanceRecord } from '@/types/models';
 
 export const attendanceService = {
-  async getSummary(): Promise<AttendanceSummary[]> {
-    return fetchClient<AttendanceSummary[]>('/absenzen');
+  async getSummary(): Promise<ClassAttendance[]> {
+    return fetchClient<ClassAttendance[]>('/absenzen');
   },
 
-  async getDetails(classId: string): Promise<AttendanceDetail[]> {
-    return fetchClient<AttendanceDetail[]>(`/absenzen/${classId}`);
+  async getDetails(classId: string): Promise<AttendanceRecord[]> {
+    return fetchClient<AttendanceRecord[]>(`/absenzen/${classId}`);
   },
 };

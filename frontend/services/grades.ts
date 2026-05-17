@@ -1,16 +1,15 @@
-import { fetchClient, buildQueryString } from '@/lib/fetchClient';
-import { Grade, GradesQueryParams, UpdateGradeRequest } from '@/types/api';
+import { fetchClient } from '@/lib/fetchClient';
+import { Grade, UpdateGradeRequest } from '@/types/models';
 
 export const gradesService = {
-  async getGrades(params: GradesQueryParams = {}): Promise<Grade[]> {
-    const query = buildQueryString(params);
-    return fetchClient<Grade[]>(`/grades${query}`);
+  async getGrades(): Promise<Grade[]> {
+    return fetchClient<Grade[]>('/grades');
   },
 
-  async updateGrade(id: string, data: { grade: number }): Promise<void> {
-    return fetchClient<void>(`/grades/${id}`, {
+  async updateGrade(id: string, payload: UpdateGradeRequest): Promise<Grade> {
+    return fetchClient<Grade>(`/grades/${id}`, {
       method: 'PATCH',
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
   },
 };
