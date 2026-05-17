@@ -53,13 +53,20 @@ export interface TimetableQueryParams {
   offset?: number;
 }
 
+export type AttendanceStatus = 
+  | 'Teilgenommen' 
+  | 'Nicht teilgenommen entschuldigt' 
+  | 'Offen' 
+  | 'Abwesend 100%' 
+  | 'Nicht teilgenommen unentschuldigt';
+
 export interface AttendanceSummary {
   classId: string;
   className: string;
   sessionDate: string;
   requiredLessons: number;
   attendedLessons: number | null;
-  status: string | null;
+  status: AttendanceStatus | null;
 }
 
 export interface AttendanceDetail {
@@ -67,7 +74,7 @@ export interface AttendanceDetail {
   sessionId: string;
   studentId: string;
   attendedLessons: number;
-  status: string;
+  status: AttendanceStatus;
 }
 
 export interface UpdateUserRequest {
