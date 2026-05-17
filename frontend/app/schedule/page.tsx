@@ -28,15 +28,15 @@ export default function SchedulePage() {
     };
   }, [currentMonth]);
 
-  const { sessions, loading, error } = useTimetable(timetableParams);
+  const { entries, loading, error } = useTimetable(timetableParams);
 
   const daySchedule = useMemo(() => {
-    return sessions.filter(s => isSameDay(parseISO(s.startTime), selectedDate));
-  }, [sessions, selectedDate]);
+    return entries.filter(s => isSameDay(parseISO(s.startTime), selectedDate));
+  }, [entries, selectedDate]);
 
   const eventDates = useMemo(() => {
-    return sessions.map(s => parseISO(s.startTime));
-  }, [sessions]);
+    return entries.map(s => parseISO(s.startTime));
+  }, [entries]);
 
   const handleDateClick = (date: Date) => {
     setSelectedDate(date);

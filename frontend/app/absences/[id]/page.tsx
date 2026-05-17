@@ -94,8 +94,15 @@ export default function AbsenceDetailPage({ params }: { params: Promise<{ id: st
                     {entry.requiredLessons} Lekt. • {entry.status || 'Offen'}
                   </Typography>
                 </div>
-                <Badge variant={entry.status === 'Teilgenommen' ? 'green' : entry.status === 'Offen' ? 'cyan' : 'red'}>
-                  {(entry.status || 'OFFEN').toUpperCase()}
+                <Badge 
+                  variant={
+                    entry.status === 'Teilgenommen' ? 'success' : 
+                    entry.status === 'Nicht teilgenommen entschuldigt' ? 'warning' :
+                    entry.status === 'Offen' ? 'neutral' : 
+                    entry.status === 'Abwesend 100%' ? 'error' : 'outline'
+                  }
+                >
+                  {entry.status || 'Offen'}
                 </Badge>
               </div>
             ))}

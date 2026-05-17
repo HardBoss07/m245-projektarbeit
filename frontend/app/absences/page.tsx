@@ -7,6 +7,7 @@ import { Card } from '@/components/atoms/Card';
 import { ListEntry } from '@/components/molecules/ListEntry';
 import { Calendar } from '@/components/molecules/Calendar';
 import { useAttendance } from '@/hooks/useAttendance';
+import { AttendanceStatus } from '@/types/models';
 import { format, parseISO, isSameDay } from 'date-fns';
 import { de } from 'date-fns/locale';
 import Link from 'next/link';
@@ -51,14 +52,12 @@ export default function AbsencesPage() {
     return summary.filter(a => a.status === 'Offen' || !a.status).length;
   }, [summary]);
 
-  const highlights = useMemo(() => {
-    const map: Record<string, 'error' | 'success'> = {};
+  const statusHighlights = useMemo(() => {
+    const map: Record<string, AttendanceStatus> = {};
     summary.forEach(s => {
-      const dateKey = format(parseISO(s.sessionDate), 'yyyy-MM-dd');
-      if (s.status === 'Offen' || !s.status) {
-        map[dateKey] = 'error';
-      } else if (s.status === 'Nicht teilgenommen entschuldigt') {
-        map[dateKey] = 'success';
+      if (s.status) {
+        const dateKey = format(parseISO(s.sessionDate), 'yyyy-MM-dd');
+        map[dateKey] = s.status;
       }
     });
     return map;
@@ -146,7 +145,7 @@ export default function AbsencesPage() {
               currentDate={currentMonth}
               onMonthChange={setCurrentMonth}
               onDateClick={setSelectedDate}
-              highlights={highlights}
+              statusHighlights={statusHighlights}
               selectedDate={selectedDate || undefined}
             />
 

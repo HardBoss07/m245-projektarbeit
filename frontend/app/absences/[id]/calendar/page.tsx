@@ -6,6 +6,7 @@ import { Typography } from '@/components/atoms/Typography';
 import { Card } from '@/components/atoms/Card';
 import { Calendar } from '@/components/molecules/Calendar';
 import { useAttendance } from '@/hooks/useAttendance';
+import { AttendanceStatus } from '@/types/models';
 import { format, parseISO, isSameDay } from 'date-fns';
 import { de } from 'date-fns/locale';
 
@@ -19,14 +20,12 @@ export default function AbsenceCalendarPage({ params }: { params: Promise<{ id: 
   const classSessions = useMemo(() => summary.filter(s => s.classId === id), [summary, id]);
   const className = classSessions.length > 0 ? classSessions[0].className : "Kalender";
 
-  const highlights = useMemo(() => {
-    const map: Record<string, 'error' | 'success' | 'primary'> = {};
+  const statusHighlights = useMemo(() => {
+    const map: Record<string, AttendanceStatus> = {};
     classSessions.forEach(s => {
-      const dateKey = format(parseISO(s.sessionDate), 'yyyy-MM-dd');
-      if (s.status === 'Offen' || !s.status) {
-        map[dateKey] = 'error';
-      } else if (s.status === 'Nicht teilgenommen entschuldigt') {
-        map[dateKey] = 'success';
+      if (s.status) {
+        const dateKey = format(parseISO(s.sessionDate), 'yyyy-MM-dd');
+        map[dateKey] = s.status;
       }
     });
     return map;
@@ -58,7 +57,7 @@ export default function AbsenceCalendarPage({ params }: { params: Promise<{ id: 
           currentDate={currentMonth}
           onMonthChange={setCurrentMonth}
           onDateClick={setSelectedDate}
-          highlights={highlights}
+          statusHighlights={statusHighlights}
           selectedDate={selectedDate || undefined}
         />
 
