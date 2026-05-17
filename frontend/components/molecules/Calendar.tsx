@@ -16,13 +16,14 @@ import { de } from 'date-fns/locale';
 import { Typography } from '@/components/atoms/Typography';
 import { Icon } from '@/components/atoms/Icon';
 import { Card } from '@/components/atoms/Card';
+import { AttendanceStatus } from '@/types/models';
 
 interface CalendarProps {
   currentDate: Date;
   onMonthChange: (date: Date) => void;
   onDateClick?: (date: Date) => void;
   eventDates?: Date[];
-  highlights?: Record<string, 'primary' | 'error' | 'success' | 'accent'>;
+  statusHighlights?: Record<string, AttendanceStatus>;
   selectedDate?: Date;
 }
 
@@ -31,13 +32,12 @@ export function Calendar({
   onMonthChange, 
   onDateClick, 
   eventDates = [], 
-  highlights = {},
+  statusHighlights = {},
   selectedDate 
 }: CalendarProps) {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(monthStart);
   
-  // Start on Monday (weekStartsOn: 1)
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
   const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
 
@@ -84,7 +84,7 @@ export function Calendar({
           const isToday = isSameDay(day, new Date());
           const isSelected = selectedDate && isSameDay(day, selectedDate);
           const dateKey = format(day, 'yyyy-MM-dd');
-          const highlight = highlights[dateKey];
+          const status = statusHighlights[dateKey];
           const hasEvent = eventDates.some(ed => isSameDay(ed, day));
 
           let bgClass = 'hover:bg-surface-container';
@@ -93,15 +93,25 @@ export function Calendar({
           if (isSelected) {
             bgClass = 'bg-accent text-white shadow-md';
             textClass = 'text-white';
-          } else if (highlight === 'error') {
-            bgClass = 'bg-error text-white shadow-sm';
-            textClass = 'text-white';
-          } else if (highlight === 'success') {
-            bgClass = 'bg-success text-white shadow-sm';
-            textClass = 'text-white';
-          } else if (highlight === 'primary') {
-            bgClass = 'bg-primary-container text-white shadow-sm';
-            textClass = 'text-white';
+          } else if (status) {
+            switch (status) {
+              case 'Teilgenommen':
+                bgClass = 'bg-green-200 text-green-950';
+                break;
+              case 'Nicht teilgenommen entschuldigt':
+                bgClass = 'bg-amber-300 text-amber-950';
+                break;
+              case 'Abwesend 100%':
+                bgClass = 'bg-red-600 text-white';
+                break;
+              case 'Nicht teilgenommen unentschuldigt':
+                bgClass = 'bg-red-900 text-white';
+                break;
+              case 'Offen':
+              default:
+                bgClass = 'bg-slate-200 text-slate-900';
+                break;
+            }
           } else if (isToday) {
             bgClass = 'border-2 border-accent';
           }
@@ -114,9 +124,6 @@ export function Calendar({
                          ${bgClass} ${textClass}`}
             >
               {format(day, 'd')}
-              {hasEvent && !isSelected && !highlight && (
-                <div className="absolute bottom-1 w-1 h-1 rounded-full bg-accent" />
-              )}
             </div>
           );
         })}
