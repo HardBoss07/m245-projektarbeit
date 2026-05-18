@@ -1,25 +1,25 @@
 ---
 name: Academic Clarity
 colors:
-  surface: '#fcf8fa'
-  surface-dim: '#dcd9db'
-  surface-bright: '#fcf8fa'
+  surface: '#ffffff'
+  surface-dim: '#f6f3f5'
+  surface-bright: '#ffffff'
   surface-container-lowest: '#ffffff'
   surface-container-low: '#f6f3f5'
   surface-container: '#f0edef'
   surface-container-high: '#eae7e9'
   surface-container-highest: '#e4e2e4'
-  on-surface: '#1b1b1d'
+  on-surface: '#020617'
   on-surface-variant: '#45464d'
-  inverse-surface: '#303032'
-  inverse-on-surface: '#f3f0f2'
+  inverse-surface: '#020617'
+  inverse-on-surface: '#ffffff'
   outline: '#76777d'
-  outline-variant: '#c6c6cd'
-  surface-tint: '#565e74'
-  primary: '#000000'
+  outline-variant: '#e2e8f0'
+  surface-tint: '#4f46e5'
+  primary: '#4f46e5'
   on-primary: '#ffffff'
-  primary-container: '#131b2e'
-  on-primary-container: '#7c839b'
+  primary-container: '#4f46e5'
+  on-primary-container: '#ffffff'
   inverse-primary: '#bec6e0'
   secondary: '#5d5f5f'
   on-secondary: '#ffffff'
@@ -33,21 +33,9 @@ colors:
   on-error: '#ffffff'
   error-container: '#ffdad6'
   on-error-container: '#93000a'
-  primary-fixed: '#dae2fd'
-  primary-fixed-dim: '#bec6e0'
-  on-primary-fixed: '#131b2e'
-  on-primary-fixed-variant: '#3f465c'
-  secondary-fixed: '#e2e2e2'
-  secondary-fixed-dim: '#c6c6c7'
-  on-secondary-fixed: '#1a1c1c'
-  on-secondary-fixed-variant: '#454747'
-  tertiary-fixed: '#fcdeb5'
-  tertiary-fixed-dim: '#dec29a'
-  on-tertiary-fixed: '#271901'
-  on-tertiary-fixed-variant: '#574425'
-  background: '#fcf8fa'
-  on-background: '#1b1b1d'
-  surface-variant: '#e4e2e4'
+  background: '#ffffff'
+  on-background: '#020617'
+  accent: '#4f46e5'
 typography:
   display:
     fontFamily: Lexend
@@ -105,61 +93,57 @@ spacing:
 
 ## Brand & Style
 
-The personality of this design system is rooted in **Academic Excellence and Digital Fluidity**. It is designed to feel authoritative and institutional yet remains highly accessible and friction-free for a student-led demographic. 
+The personality of this design system is rooted in **Academic Clarity and Modern Fluidity**. It is designed to feel authoritative yet accessible, providing a streamlined experience for students and faculty.
 
-The aesthetic follows a **Corporate / Modern** movement, prioritizing functional clarity and structural integrity. It utilizes generous white space and a rigid grid to evoke a sense of organization and calm. By blending traditional educational color palettes with modern interface patterns, the system creates a bridge between formal institutionality and contemporary mobile-first lifestyles.
+The aesthetic prioritizes functional clarity. It utilizes a minimalist palette, generous white space, and a rigid, reliable grid. By blending formal institutional needs with modern interface patterns, the system creates a seamless bridge between academic formality and daily digital utility.
 
 ## Colors
 
-The palette is anchored by **Deep Navy (#0F172A)**, providing a sophisticated and stable foundation for headers and key branding elements. This is balanced by a **Pure White (#FFFFFF)** background to maintain a "clean-sheet" feel that reduces cognitive load during study or navigation.
+The palette is anchored by a high-contrast **Slate (#020617)** for typography and key UI borders, ensuring maximum legibility. The background is **Pure White (#FFFFFF)** to maintain a clean "open book" feel that reduces cognitive load.
 
-The action layer uses **Vibrant Cyan (#00BAFF)** as the primary accent. This color is reserved strictly for interactive elements—buttons, active states, and progress indicators—to create a clear mental model for the user. A functional **Emerald Green (#10B981)** is utilized for success states and completion markers, reinforcing a positive feedback loop for student achievements.
+The primary accent is **Indigo-600 (#4f46e5)**. This color defines the interactive layer—buttons, active links, and focus indicators. Success states and completion indicators utilize soft greens consistent with the primary design language, reinforcing positive feedback loops without clashing with the primary palette.
 
 ## Typography
 
-This design system utilizes **Lexend** as the sole typeface. Chosen for its specific design intent to reduce visual stress and improve reading speed, Lexend aligns perfectly with an educational context.
+This design system utilizes **Lexend**. Chosen for its design intent to reduce visual stress and improve reading speed, Lexend is the sole typeface, ensuring cohesive branding.
 
-Headlines use semi-bold and bold weights with tighter tracking to create a strong visual hierarchy. Body text is set with generous line height to ensure legibility during long reading sessions. Labels and micro-copy utilize a medium weight and increased letter spacing to remain legible at small scales on mobile displays.
+Headlines use semi-bold and bold weights to establish hierarchy, while body text uses a normal weight with calibrated line heights for comfortable, extended reading. Labels utilize an uppercase, medium-weight style to add clear structural distinctions at small scales.
 
 ## Layout & Spacing
 
-The layout utilizes a **4-column fluid grid** tailored for mobile screens. A standard 20px outer margin ensures content does not feel cramped against the device edges, while a 12px gutter provides breathing room between columns.
+The layout is optimized for mobile-first usage. It utilizes a fluid grid with a standard 20px outer margin, ensuring touch-friendly interaction zones.
 
-The spacing rhythm is based on a **4px baseline unit**. All padding and margins between elements should be increments of this unit (8px, 16px, 24px). Horizontal spacing between related items (like icons and labels) should typically be 8px (sm), while vertical spacing between distinct sections should be 24px (lg) or 32px (xl) to maintain clear content grouping.
+The spacing rhythm is based on a **4px baseline unit**. All padding and margins are increments of this unit (8px, 16px, 24px, 32px), creating a consistent vertical and horizontal cadence across all components.
 
 ## Elevation & Depth
 
-Depth is conveyed through **Tonal Layering and Ambient Shadows**. The system avoids heavy drop shadows in favor of subtle, diffused "soft-glow" shadows to indicate interactivity and hierarchy.
+Depth is conveyed through **Subtle Tonal Boundaries** rather than heavy shadows.
 
 - **Level 0 (Base):** White background (#FFFFFF).
-- **Level 1 (Cards):** Subsurface gray or white with a 1px border (#E2E8F0) or a very soft shadow (0px 2px 8px rgba(15, 23, 42, 0.05)).
-- **Level 2 (Active/Floating):** Raised elements like primary buttons or active cards use a more pronounced shadow (0px 4px 12px rgba(15, 23, 42, 0.1)) to suggest they are "above" the content.
-
-This approach ensures the UI feels light and airy rather than cluttered with heavy skeuomorphic effects.
+- **Level 1 (Cards):** Subsurface containers with a 1px border (#E2E8F0) and extremely light, diffused shadows (0px 2px 8px rgba(15, 23, 42, 0.05)) only when elevation is explicitly required.
+- **Level 2 (Active):** Interactive elements such as primary buttons use scale transforms (`active:scale-[0.98]`) to provide immediate physical feedback.
 
 ## Shapes
 
-The shape language is defined by **Rounded (Level 2)** containers. This curvature softens the professional "Deep Navy" palette, making the app feel more approachable and modern for a younger student audience.
+The shape language uses **Standard Rounded (Level 2)** containers. This curvature balances the formal nature of the academic context with a modern, approachable feel.
 
 - **Standard Elements (Buttons, Inputs):** 8px (0.5rem) radius.
-- **Large Containers (Cards, Modals):** 16px (1rem) radius.
-- **Small Elements (Chips, Tags):** Full pill-shape (typically 24px+) for high distinction.
-
-All icons should follow a consistent "Rounded" style, avoiding sharp corners in the glyphs to match the container logic.
+- **Large Containers (Cards, Modals):** 12px (0.75rem) or 16px (1rem) radius.
+- **Small Elements (Badges, Pills):** Pill-shape (9999px) for distinct status indicators.
 
 ## Components
 
 ### Buttons
-Primary actions use a solid **Vibrant Cyan** fill with white text. Secondary actions use the **Deep Navy** in an outlined style (Ghost Button). All buttons have a minimum height of 48px to ensure easy "tocco" (touch) targets.
+Primary actions are solid **Indigo-600** fills. Secondary actions (Ghost) use transparent backgrounds with colored text and borders to maintain a lightweight presence. Minimum touch target height is 48px.
 
 ### Cards
-Cards are the primary content vessel. They feature a 16px corner radius, a subtle 1px border (#E2E8F0), and an optional soft shadow if the content is high-priority. Padding inside cards is strictly 16px (md) or 20px.
+Cards are the foundational content containers. They feature a defined corner radius (12px), a 1px `outline-variant` border, and consistent internal padding (16px).
 
 ### Input Fields
-Fields use a light gray background (#F8FAFC) with an 8px radius. On focus, the border transitions to a 2px Vibrant Cyan stroke. Placeholder text is set in `body-md` using the neutral base color.
+Inputs use a `surface-container-low` background, an 8px corner radius, and a 1px `outline-variant` border. On focus, the border transitions to a 2px Indigo-600 stroke with a subtle ring effect.
 
-### Chips
-Used for filters or categories, chips are pill-shaped. Active chips use a light tint of the accent color (Cyan at 10% opacity) with a solid Cyan text color to indicate selection without over-powering the primary buttons.
+### Badges
+Pill-shaped status markers using specific color variants (e.g., success, error, neutral) on a light, tinted background, following the design system's atomic structure.
 
 ### Navigation
-The bottom navigation bar uses a blur effect (Backdrop Filter) with a subtle top border. Icons are 24x24px, with active states highlighted in the primary accent color.
+The navigation utilizes bottom-bar patterns for mobile, emphasizing high-accessibility touch targets with clear, legible labeling.
