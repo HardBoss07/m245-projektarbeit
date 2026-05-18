@@ -14,6 +14,7 @@ use tokio::fs::File;
 use tokio_util::io::ReaderStream;
 use uuid::Uuid;
 
+/// Response object for document metadata.
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DocumentResponse {
@@ -34,8 +35,18 @@ impl From<Document> for DocumentResponse {
     }
 }
 
-/// GET /api/v1/documents
 /// Lists documents accessible to the current user.
+///
+/// # Arguments
+/// * `state` - Application state.
+/// * `claims` - Authenticated user claims.
+/// * `pagination` - Pagination parameters (`limit` and `offset`).
+///
+/// # Returns
+/// A JSON array of `DocumentResponse` metadata.
+///
+/// # Errors
+/// Returns `AppError::Sqlx` if database query fails.
 pub async fn list_documents(
     State(state): State<AppState>,
     claims: Claims,
@@ -68,8 +79,20 @@ pub async fn list_documents(
     Ok(Json(response))
 }
 
-/// POST /api/v1/documents
 /// Uploads a new document. Only accessible by teachers (Dozenten).
+///
+/// # Arguments
+/// * `state` - Application state.
+/// * `claims` - Authenticated user claims.
+/// * `multipart` - Multipart form data containing document details and file.
+///
+/// # Returns
+/// HTTP 201 Created status on success.
+///
+/// # Errors
+/// Returns `AppError::Unauthorized` if the user is not a teacher.
+/// Returns `AppError::BadRequest` if required fields are missing.
+/// Returns `AppError::Internal` if file processing fails.
 pub async fn upload_document(
     State(state): State<AppState>,
     claims: Claims,
@@ -162,8 +185,19 @@ pub async fn upload_document(
     Ok(axum::http::StatusCode::CREATED)
 }
 
-/// GET /api/v1/documents/:id
-/// Streams the document file if the user has permission.
+/// Streams a document file if the user has permission.
+///
+/// # Arguments
+/// * `state` - Application state.
+/// * `claims` - Authenticated user claims.
+/// * `id` - UUID of the document to download.
+///
+/// # Returns
+/// A stream of file bytes (`axum::body::Body`).
+///
+/// # Errors
+/// Returns `AppError::NotFound` if the document or file is missing.
+/// Returns `AppError::Forbidden` if access is denied.
 pub async fn download_document(
     State(state): State<AppState>,
     claims: Claims,

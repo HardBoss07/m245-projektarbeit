@@ -10,17 +10,23 @@ use chrono::{Duration, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+/// Request payload for user login.
 #[derive(Deserialize)]
 pub struct LoginRequest {
     pub email: String,
     pub password: String,
 }
 
+/// Response containing the JWT access token.
 #[derive(Serialize)]
 pub struct AuthResponse {
     pub token: String,
 }
 
+/// Legacy login handler (currently disabled).
+///
+/// # Returns
+/// Always returns `401 Unauthorized`.
 pub async fn login(
     State(_state): State<AppState>,
     _jar: CookieJar,
@@ -29,6 +35,17 @@ pub async fn login(
     Err::<StatusCode, AppError>(AppError::Unauthorized) // Legacy auth disabled
 }
 
+/// Performs a dummy OAuth login for local development.
+///
+/// # Arguments
+/// * `state` - Application state.
+/// * `jar` - Cookie jar for managing the refresh token cookie.
+///
+/// # Returns
+/// A JSON response with an `AuthResponse` containing an access token and a `Set-Cookie` header for the refresh token.
+///
+/// # Errors
+/// Returns `AppError::Unauthorized` if the dummy user is not found.
 pub async fn dummy_oauth(
     State(state): State<AppState>,
     jar: CookieJar,
@@ -51,7 +68,9 @@ pub async fn dummy_oauth(
     let user = match user {
         Some(u) => u,
         None => {
-            tracing::error!("Dummy OAuth user not found in database. Ensure example_data.sql is loaded.");
+            tracing::error!(
+                "Dummy OAuth user not found in database. Ensure example_data.sql is loaded."
+            );
             return Err(AppError::Unauthorized);
         }
     };
@@ -87,6 +106,17 @@ pub async fn dummy_oauth(
     Ok((jar.add(cookie), Json(AuthResponse { token })))
 }
 
+/// Refreshes the authentication session using a valid refresh token.
+///
+/// # Arguments
+/// * `state` - Application state.
+/// * `jar` - Cookie jar to extract the existing refresh token.
+///
+/// # Returns
+/// A JSON response with a new `AuthResponse` containing an access token and a `Set-Cookie` header for the new refresh token.
+///
+/// # Errors
+/// Returns `AppError::Unauthorized` if the refresh token is missing, revoked, expired, or reused.
 pub async fn refresh(
     State(state): State<AppState>,
     jar: CookieJar,
@@ -185,6 +215,7 @@ pub async fn refresh(
     ))
 }
 
+/// Request payload for user registration.
 #[derive(Deserialize)]
 pub struct RegisterRequest {
     pub email: String,
@@ -193,6 +224,17 @@ pub struct RegisterRequest {
     pub last_name: String,
 }
 
+/// Registers a new user.
+///
+/// # Arguments
+/// * `state` - Application state.
+/// * `payload` - Registration details (`RegisterRequest`).
+///
+/// # Returns
+/// A JSON response with a success message and HTTP 201 Created.
+///
+/// # Errors
+/// Returns `AppError::Sqlx` if database insertion fails.
 pub async fn register(
     State(state): State<AppState>,
     Json(payload): Json<RegisterRequest>,

@@ -10,9 +10,12 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+/// Query parameters for filtering and paginating timetable sessions.
 #[derive(Debug, Deserialize)]
 pub struct TimetableQuery {
+    /// Start date filter (RFC3339).
     pub from: Option<String>,
+    /// End date filter (RFC3339).
     pub to: Option<String>,
     #[serde(flatten)]
     pub pagination: Pagination,
@@ -44,8 +47,18 @@ pub struct TimetableEntry {
     pub class_designation: String,
 }
 
-/// GET /api/v1/timetable
 /// Retrieves the timetable sessions for the authenticated user (student or teacher).
+///
+/// # Arguments
+/// * `state` - Application state.
+/// * `claims` - Authenticated user claims.
+/// * `query` - Optional filtering (from, to) and pagination parameters.
+///
+/// # Returns
+/// A JSON array of `TimetableEntry` objects for the specified time range and page.
+///
+/// # Errors
+/// Returns `AppError::Sqlx` if the database query fails.
 pub async fn get_timetable(
     State(state): State<AppState>,
     claims: Claims,

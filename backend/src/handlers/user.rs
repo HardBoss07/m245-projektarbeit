@@ -9,12 +9,16 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+/// Payload for updating user profile settings.
 #[derive(Debug, Deserialize)]
 pub struct UpdateUserPayload {
+    /// Preferred UI language.
     pub language: Option<String>,
+    /// Whether to publish user profile details.
     pub publish_details: Option<bool>,
 }
 
+/// Response containing user profile information.
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UserResponse {
@@ -41,8 +45,18 @@ impl From<User> for UserResponse {
     }
 }
 
-/// GET /api/v1/users/me
-/// Returns the profile details of the currently authenticated user.
+/// Retrieves the profile details of the currently authenticated user.
+///
+/// # Arguments
+/// * `state` - Application state.
+/// * `claims` - Authenticated user claims.
+///
+/// # Returns
+/// A JSON response containing `UserResponse`.
+///
+/// # Errors
+/// Returns `AppError::NotFound` if the user does not exist.
+/// Returns `AppError::Sqlx` if a database error occurs.
 pub async fn get_me(
     State(state): State<AppState>,
     claims: Claims,
@@ -86,8 +100,19 @@ pub async fn get_me(
     Ok(axum::Json(response))
 }
 
-/// PATCH /api/v1/users/me
 /// Updates the profile preferences for the currently authenticated user.
+///
+/// # Arguments
+/// * `state` - Application state.
+/// * `claims` - Authenticated user claims.
+/// * `payload` - New user preferences (`UpdateUserPayload`).
+///
+/// # Returns
+/// A JSON response containing the updated `UserResponse`.
+///
+/// # Errors
+/// Returns `AppError::NotFound` if the user is not found.
+/// Returns `AppError::Sqlx` if a database error occurs.
 pub async fn update_me(
     State(state): State<AppState>,
     claims: Claims,

@@ -12,6 +12,14 @@ use axum::{
 };
 use uuid::Uuid;
 
+/// Retrieves all grades for the authenticated student.
+///
+/// # Arguments
+/// * `state` - Application state containing the database pool.
+/// * `claims` - Authenticated user claims.
+///
+/// # Errors
+/// Returns `AppError::Sqlx` if the database query fails.
 pub async fn get_grades(
     State(state): State<AppState>,
     claims: Claims,
@@ -39,6 +47,17 @@ pub async fn get_grades(
     Ok(Json(grades))
 }
 
+/// Updates an exam grade (Teacher only).
+///
+/// # Arguments
+/// * `state` - Application state containing the database pool.
+/// * `claims` - Authenticated user claims.
+/// * `result_id` - UUID of the exam result to update.
+/// * `payload` - New grade value.
+///
+/// # Errors
+/// Returns `AppError::Unauthorized` if the user is not a teacher.
+/// Returns `AppError::Sqlx` if the database update fails.
 pub async fn update_grade(
     State(state): State<AppState>,
     claims: Claims,

@@ -11,6 +11,17 @@ use axum::{
 };
 use uuid::Uuid;
 
+/// Retrieves an overview of attendance for all classes the authenticated student is enrolled in.
+///
+/// # Arguments
+/// * `state` - Application state.
+/// * `claims` - Authenticated user claims.
+///
+/// # Returns
+/// A JSON array of `ClassAttendance` records containing class details and attendance status.
+///
+/// # Errors
+/// Returns `AppError::Sqlx` if the database query fails.
 pub async fn get_attendance_overview(
     State(state): State<AppState>,
     claims: Claims,
@@ -39,6 +50,18 @@ pub async fn get_attendance_overview(
     Ok(Json(attendance))
 }
 
+/// Retrieves detailed attendance records for a specific class for the authenticated student.
+///
+/// # Arguments
+/// * `state` - Application state.
+/// * `claims` - Authenticated user claims.
+/// * `class_id` - UUID of the class to retrieve details for.
+///
+/// # Returns
+/// A JSON array of `AttendanceRecord` objects.
+///
+/// # Errors
+/// Returns `AppError::Sqlx` if the database query fails.
 pub async fn get_attendance_detail(
     State(state): State<AppState>,
     claims: Claims,
