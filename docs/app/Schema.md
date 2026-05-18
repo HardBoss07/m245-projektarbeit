@@ -1,50 +1,70 @@
-### Schema Documentation
+### Database Schema Documentation
 
-- **roles**: (Lookup table for user types)
-  - role name (e.g., Lernende, Dozent)
-- **users (login & profile)**:
-  - mail (demo) / OpenID (real app)
-  - password hash
-  - first name
-  - last name
-  - gender
-  - birth date
-  - language
-  - publish details (boolean)
-  - role reference (MKT-Funktion)
+- **roles**: (Lookup table for user roles)
+  - `id`: UUID (Primary Key)
+  - `name`: String (e.g., Lernende, Dozent)
+- **users**: (Core identity and profile information)
+  - `id`: UUID (Primary Key)
+  - `role_id`: UUID (Foreign Key to `roles`)
+  - `email`: String (Unique)
+  - `password_hash`: String
+  - `first_name`: String
+  - `last_name`: String
+  - `gender`: String
+  - `birth_date`: Date
+  - `language`: String
+  - `publish_details`: Boolean
+  - `created_at`: Timestamp
 - **classes**:
-  - class designation (e.g., IFZK-2524-017)
+  - `id`: UUID (Primary Key)
+  - `designation`: String (e.g., IFZK-2524-017)
 - **class_enrollments**: (Junction table linking students to classes)
-  - user reference
-  - class reference
+  - `user_id`: UUID (Foreign Key)
+  - `class_id`: UUID (Foreign Key)
 - **rooms**:
-  - room name (e.g., ZH 208, ZH 404)
+  - `id`: UUID (Primary Key)
+  - `name`: String (e.g., ZH 208)
 - **subjects**: (High-level curriculum definition)
-  - subject code (e.g., GB-ZH-IFZK-M-B21-03-IK-GE-231)
-  - subject name (e.g., Datenschutz und Datensicherheit anwenden)
-- **events / courses**: (Specific instance of a subject for a class)
-  - event shortcut (e.g., 32325 / IFZK...)
-  - subject reference
-  - class reference
+  - `id`: UUID (Primary Key)
+  - `name`: String
+  - `code`: String
+- **events**: (Specific instance of a subject for a class)
+  - `id`: UUID (Primary Key)
+  - `event_shortcut`: String
+  - `subject_id`: UUID (Foreign Key)
+  - `class_id`: UUID (Foreign Key)
+  - `weight_percentage`: Decimal
 - **timetable_sessions**:
-  - event reference
-  - room reference
-  - lecturer reference (points to users table)
-  - start time (Von)
-  - end time (Bis)
-  - remarks
+  - `id`: UUID (Primary Key)
+  - `event_id`: UUID (Foreign Key)
+  - `room_id`: UUID (Foreign Key)
+  - `lecturer_id`: UUID (Foreign Key to `users`)
+  - `start_time`: Timestamp
+  - `end_time`: Timestamp
+  - `remarks`: String
 - **documents**:
-  - filename / designation
-  - file path / URI
-  - document type (ENUM: GENERAL, PERSONAL)
-  - target user reference (NULL if general, populated if personal)
-  - modified by reference (who uploaded it)
-  - modified at (datetime)
-- **exams**: (The definition of the test)
-  - event reference
-  - description (e.g., ZP, LB)
-  - weight percentage (e.g., 70.00, 15.00, 15.00)
-- **exam_results**: (The actual grade the student achieved)
-  - exam reference
-  - student reference (points to users)
-  - grade value (e.g., 5.100)
+  - `id`: UUID (Primary Key)
+  - `designation`: String
+  - `file_path`: String
+  - `document_type`: ENUM (GENERAL, PERSONAL)
+  - `target_user_id`: UUID (Foreign Key, nullable)
+  - `modified_by`: UUID (Foreign Key to `users`)
+  - `modified_at`: Timestamp
+- **exams**:
+  - `id`: UUID (Primary Key)
+  - `event_id`: UUID (Foreign Key)
+  - `description`: String
+  - `weight_percentage`: Decimal
+- **exam_results**:
+  - `id`: UUID (Primary Key)
+  - `exam_id`: UUID (Foreign Key)
+  - `student_id`: UUID (Foreign Key to `users`)
+  - `grade`: Decimal
+- **refresh_tokens**:
+  - `id`: UUID (Primary Key)
+  - `user_id`: UUID (Foreign Key)
+  - `token_hash`: String
+  - `family_id`: UUID
+  - `expires_at`: Timestamp
+  - `rotated_at`: Timestamp (nullable)
+  - `is_revoked`: Boolean

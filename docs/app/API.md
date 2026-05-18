@@ -44,18 +44,11 @@ Creates a new student account.
   ```
 - **Response:** `201 Created`
 
-### `POST /auth/login`
+### `POST /auth/dummy-oauth`
 
-Authenticates a user and returns an access token. Sets a `refresh_token` cookie.
+Performs a dummy OAuth login for local development and returns an access token. Sets a `refresh_token` cookie.
 
 - **Auth:** Public
-- **Body:**
-  ```json
-  {
-    "email": "student@example.com",
-    "password": "securepassword"
-  }
-  ```
 - **Response:** `200 OK`
   ```json
   { "token": "jwt_access_token_here" }
@@ -144,75 +137,47 @@ Retrieves timetable sessions within a date range.
 
 ### `GET /grades`
 
-Retrieves all grades for the authenticated student, grouped by subject.
+Retrieves all grades for the authenticated student.
 
 - **Auth:** Required
-- **Query Parameters:**
-  - `event_id`: UUID (optional, filter by course instance)
-  - `limit`: Integer (optional)
-  - `offset`: Integer (optional)
 - **Response:** `200 OK`
   ```json
   [
     {
-      "eventId": "uuid",
-      "subjectName": "Datenbanken",
-      "subjectCode": "M164",
-      "averageGrade": 5.2,
-      "grades": [
-        {
-          "examId": "uuid",
-          "examDescription": "Modulprüfung",
-          "grade": 5.5,
-          "weightPercentage": 100.0
-        }
-      ]
+      "id": "uuid",
+      "subject": "Datenbanken",
+      "grade": 5.2,
+      "weight": 100.0,
+      "description": "Modulprüfung"
     }
   ]
   ```
 
-### `POST /grades`
+### `PATCH /grades/:id`
 
-Publishes or updates a grade for a student.
+Updates a specific exam grade.
 
 - **Auth:** Required (Role: `Dozent`)
 - **Body:**
   ```json
   {
-    "exam_id": "uuid",
-    "student_id": "uuid",
     "grade": 5.25
   }
   ```
-- **Response:** `201 Created`
+- **Response:** `200 OK`
 
 ---
 
-## 6. Lookups (Static Data)
-
-All lookup endpoints support `limit` and `offset` query parameters.
-
-### `GET /lookups/rooms`
-
-List all physical rooms.
-
-### `GET /lookups/subjects`
-
-List all school subjects/modules.
-
-### `GET /lookups/classes`
-
-List all school classes.
-
----
-
-## 7. Documents
+## 6. Documents
 
 ### `GET /documents`
 
 Lists documents accessible to the user (GENERAL documents + PERSONAL ones targeting the user).
 
 - **Auth:** Required
+- **Query Parameters:**
+  - `limit`: Integer (optional)
+  - `offset`: Integer (optional)
 - **Response:** `200 OK`
   ```json
   [
@@ -227,9 +192,9 @@ Lists documents accessible to the user (GENERAL documents + PERSONAL ones target
 
 ### `GET /documents/:id`
 
-Downloads/Streams a document file.
+Streams a document file for download.
 
-- **Auth:** Required (Permission check: user must be the target or have created it, unless it's GENERAL).
+- **Auth:** Required
 - **Response:** File Stream
 
 ### `POST /documents`
@@ -239,18 +204,18 @@ Uploads a new document.
 - **Auth:** Required (Role: `Dozent`)
 - **Body:** `multipart/form-data`
   - `designation`: String
-  - `documentType`: "GENERAL" or "PERSONAL"
-  - `targetUserId`: UUID (required if PERSONAL)
+  - `documentType`: "GENERAL" | "PERSONAL"
+  - `targetUserId`: UUID (optional, required if PERSONAL)
   - `file`: Binary Data
 - **Response:** `201 Created`
 
 ---
 
-## 8. Attendance (Absenzen)
+## 7. Attendance (Absenzen)
 
 ### `GET /absenzen`
 
-Aggregated overview of attendance per class.
+Aggregated overview of attendance for all enrolled classes.
 
 - **Auth:** Required
 - **Response:** `200 OK`
@@ -258,30 +223,29 @@ Aggregated overview of attendance per class.
   [
     {
       "classId": "uuid",
-      "shortName": "IFZK-2524",
-      "classType": "Modul",
-      "description": "Datenbanken erstellen",
-      "soll": 40.0,
-      "besucht": 36.0,
-      "anwesenheit": 90
+      "className": "IFZK-2524",
+      "sessionDate": "2024-05-08T08:00:00Z",
+      "requiredLessons": 4.0,
+      "attendedLessons": 4.0,
+      "status": "Teilgenommen"
     }
   ]
   ```
 
 ### `GET /absenzen/:class_id`
 
-Detailed session-by-session attendance for a specific class.
+Detailed attendance record for a specific class.
 
 - **Auth:** Required
 - **Response:** `200 OK`
   ```json
   [
     {
-      "sessionDate": "2024-05-08T08:00:00Z",
-      "requiredLessons": 4.0,
+      "id": "uuid",
+      "sessionId": "uuid",
+      "studentId": "uuid",
       "attendedLessons": 4.0,
-      "status": "Teilgenommen",
-      "anwesenheit": 100
+      "status": "Teilgenommen"
     }
   ]
   ```
