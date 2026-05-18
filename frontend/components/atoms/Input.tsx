@@ -1,10 +1,21 @@
 import React from 'react';
 
+/**
+ * Properties for the Input component.
+ */
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  /** Optional label text for the input field. */
   label?: string;
+  /** Optional error message to display below the input. */
   error?: string;
 }
 
+/**
+ * Atomic component representing an accessible text input field.
+ *
+ * @param {InputProps} props - The component properties.
+ * @returns {JSX.Element} The rendered Input component.
+ */
 export const Input: React.FC<InputProps> = ({ label, error, className = '', ...props }) => {
   return (
     <div className={`flex flex-col gap-1.5 w-full ${className}`}>

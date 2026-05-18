@@ -1,11 +1,23 @@
 import React from 'react';
 
+/**
+ * Properties for the Button component.
+ */
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** The visual style variant of the button. Defaults to 'primary'. */
   variant?: 'primary' | 'secondary' | 'ghost';
+  /** Whether the button should span the full width of its container. */
   fullWidth?: boolean;
+  /** The content to be displayed within the button. */
   children: React.ReactNode;
 }
 
+/**
+ * Atomic component representing a standard clickable button.
+ *
+ * @param {ButtonProps} props - The component properties.
+ * @returns {JSX.Element} The rendered Button component.
+ */
 export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   fullWidth = false,
