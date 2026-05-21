@@ -124,6 +124,9 @@ export function Calendar({
                          ${bgClass} ${textClass}`}
             >
               {format(day, 'd')}
+              {hasEvent && (
+                <div className={`absolute bottom-1.5 w-1 h-1 rounded-full ${isSelected ? 'bg-white/80' : 'bg-sky-400'}`} />
+              )}
             </div>
           );
         })}
