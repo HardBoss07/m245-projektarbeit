@@ -6,21 +6,46 @@ import { Typography } from '@/components/atoms/Typography';
 import { Card } from '@/components/atoms/Card';
 import { ListEntry } from '@/components/molecules/ListEntry';
 import { Calendar } from '@/components/molecules/Calendar';
+import { SearchBar } from '@/components/molecules/SearchBar';
+import { FilterChips } from '@/components/molecules/FilterChips';
 import { useAttendance } from '@/hooks/useAttendance';
 import { AttendanceStatus } from '@/types/models';
 import { format, parseISO, isSameDay } from 'date-fns';
 import { de } from 'date-fns/locale';
 import Link from 'next/link';
 
+type FilterStatus = AttendanceStatus | 'All';
+
+const FILTER_OPTIONS: FilterStatus[] = [
+  'All',
+  'Teilgenommen',
+  'Nicht teilgenommen entschuldigt',
+  'Offen',
+  'Abwesend 100%',
+  'Nicht teilgenommen unentschuldigt'
+];
+
 export default function AbsencesPage() {
   const { summary, loading, error } = useAttendance();
   const [view, setView] = useState<'list' | 'calendar'>('list');
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState<FilterStatus>('All');
+
+  // Combined filtering logic
+  const filteredSummary = useMemo(() => {
+    return summary.filter(entry => {
+      const matchesSearch = entry.className.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = activeFilter === 'All' || 
+                           (activeFilter === 'Offen' ? (entry.status === 'Offen' || !entry.status) : entry.status === activeFilter);
+      return matchesSearch && matchesStatus;
+    });
+  }, [summary, searchQuery, activeFilter]);
 
   // Group summary by classId/className for the list view
   const classSummaries = useMemo(() => {
-    return summary.reduce((acc, entry) => {
+    return filteredSummary.reduce((acc, entry) => {
       if (!acc[entry.classId]) {
         acc[entry.classId] = {
           id: entry.classId,
@@ -36,7 +61,7 @@ export default function AbsencesPage() {
       
       return acc;
     }, {} as Record<string, any>);
-  }, [summary]);
+  }, [filteredSummary]);
 
   const list = Object.values(classSummaries);
   
@@ -48,31 +73,45 @@ export default function AbsencesPage() {
     }, 0);
   }, [summary]);
 
-  const openAbsences = useMemo(() => {
+  const openAbsencesCount = useMemo(() => {
     return summary.filter(a => a.status === 'Offen' || !a.status).length;
   }, [summary]);
 
   const statusHighlights = useMemo(() => {
     const map: Record<string, AttendanceStatus> = {};
-    summary.forEach(s => {
+    filteredSummary.forEach(s => {
       if (s.status) {
         const dateKey = format(parseISO(s.sessionDate), 'yyyy-MM-dd');
         map[dateKey] = s.status;
       }
     });
     return map;
-  }, [summary]);
+  }, [filteredSummary]);
 
   const selectedAbsences = useMemo(() => {
     if (!selectedDate) return [];
-    return summary.filter(s => isSameDay(parseISO(s.sessionDate), selectedDate));
-  }, [selectedDate, summary]);
+    return filteredSummary.filter(s => isSameDay(parseISO(s.sessionDate), selectedDate));
+  }, [selectedDate, filteredSummary]);
 
   return (
     <MobileShell title="Absenzen" subtitle={view === 'list' ? "Semester 4 • 2026" : format(currentMonth, "MMMM yyyy", { locale: de })}>
       <div className="flex flex-col gap-md">
+        {/* Search and Filter Section */}
+        <div className="p-margin flex flex-col gap-2">
+          <SearchBar 
+            placeholder="Nach Modul suchen..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <FilterChips 
+            options={FILTER_OPTIONS}
+            activeOption={activeFilter}
+            onOptionChange={setActiveFilter}
+          />
+        </div>
+
         {/* View Toggle */}
-        <div className="px-margin pt-md">
+        <div className="px-margin">
           <div className="flex bg-surface-container p-1 rounded-xl">
             <button 
               onClick={() => setView('list')}
@@ -115,7 +154,7 @@ export default function AbsencesPage() {
                   ))
                 ) : (
                   <div className="p-md text-center text-on-surface-variant italic">
-                    Keine Absenzen erfasst
+                    {searchQuery || activeFilter !== 'All' ? 'Keine Übereinstimmungen gefunden' : 'Keine Absenzen erfasst'}
                   </div>
                 )}
               </Card>
@@ -129,10 +168,10 @@ export default function AbsencesPage() {
                   <Typography variant="label-sm" className="text-on-surface-variant">Gesamt (Lekt.)</Typography>
                 </div>
                 <div className="flex flex-col text-right">
-                  <Typography variant="display" className={openAbsences > 0 ? "text-error" : "text-primary"}>
-                    {openAbsences}
+                  <Typography variant="display" className={openAbsencesCount > 0 ? "text-error" : "text-primary"}>
+                    {openAbsencesCount}
                   </Typography>
-                  <Typography variant="label-sm" className={`${openAbsences > 0 ? "text-error" : "text-on-surface-variant"} font-bold`}>
+                  <Typography variant="label-sm" className={`${openAbsencesCount > 0 ? "text-error" : "text-on-surface-variant"} font-bold`}>
                     Offene Einträge
                   </Typography>
                 </div>
@@ -158,12 +197,12 @@ export default function AbsencesPage() {
                 {selectedAbsences.length > 0 ? (
                   <div className="flex flex-col gap-2">
                     {selectedAbsences.map((abs, idx) => (
-                      <Card key={idx} variant="elevated" className="bg-white">
+                      <Card key={`${abs.classId}-${idx}`} variant="elevated" className="bg-white">
                         <div className="flex justify-between items-start">
                           <div>
                             <Typography variant="body-md" className="font-bold">{abs.className}</Typography>
                             <Typography variant="label-sm" className="text-on-surface-variant">
-                              {abs.requiredLessons} Lektionen • {abs.status || 'Unentschuldigt'}
+                              {abs.requiredLessons} Lektionen • {abs.status || 'Offen'}
                             </Typography>
                           </div>
                           <div className={`w-3 h-3 rounded-full ${abs.status === 'Nicht teilgenommen entschuldigt' ? 'bg-success' : 'bg-error'}`} />
@@ -173,7 +212,7 @@ export default function AbsencesPage() {
                   </div>
                 ) : (
                   <Card className="p-md text-center text-on-surface-variant italic">
-                    Keine Einträge für diesen Tag
+                    {searchQuery || activeFilter !== 'All' ? 'Keine Übereinstimmungen für diesen Tag' : 'Keine Einträge für diesen Tag'}
                   </Card>
                 )}
               </section>
