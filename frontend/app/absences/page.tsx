@@ -45,9 +45,9 @@ export default function AbsencesPage() {
 
   // Group summary by classId/className for the list view
   const classSummaries = useMemo(() => {
-    return filteredSummary.reduce((acc, entry) => {
-      if (!acc[entry.classId]) {
-        acc[entry.classId] = {
+    return filteredSummary.reduce((accumulator, entry) => {
+      if (!accumulator[entry.classId]) {
+        accumulator[entry.classId] = {
           id: entry.classId,
           name: entry.className,
           totalRequired: 0,
@@ -56,33 +56,33 @@ export default function AbsencesPage() {
         };
       }
       const attended = entry.attendedLessons ? Number(entry.attendedLessons) : 0;
-      acc[entry.classId].totalRequired += Number(entry.requiredLessons);
-      acc[entry.classId].totalAttended += attended;
+      accumulator[entry.classId].totalRequired += Number(entry.requiredLessons);
+      accumulator[entry.classId].totalAttended += attended;
       
-      return acc;
+      return accumulator;
     }, {} as Record<string, any>);
   }, [filteredSummary]);
 
   const list = Object.values(classSummaries);
   
   const totalMissed = useMemo(() => {
-    return summary.reduce((acc, entry) => {
+    return summary.reduce((accumulator, entry) => {
       const required = Number(entry.requiredLessons);
       const attended = entry.attendedLessons ? Number(entry.attendedLessons) : 0;
-      return acc + (required - attended);
+      return accumulator + (required - attended);
     }, 0);
   }, [summary]);
 
   const openAbsencesCount = useMemo(() => {
-    return summary.filter(a => a.status === 'Offen' || !a.status).length;
+    return summary.filter(absence => absence.status === 'Offen' || !absence.status).length;
   }, [summary]);
 
   const statusHighlights = useMemo(() => {
     const map: Record<string, AttendanceStatus> = {};
-    filteredSummary.forEach(s => {
-      if (s.status) {
-        const dateKey = format(parseISO(s.sessionDate), 'yyyy-MM-dd');
-        map[dateKey] = s.status;
+    filteredSummary.forEach(summaryItem => {
+      if (summaryItem.status) {
+        const dateKey = format(parseISO(summaryItem.sessionDate), 'yyyy-MM-dd');
+        map[dateKey] = summaryItem.status;
       }
     });
     return map;
@@ -90,7 +90,7 @@ export default function AbsencesPage() {
 
   const selectedAbsences = useMemo(() => {
     if (!selectedDate) return [];
-    return filteredSummary.filter(s => isSameDay(parseISO(s.sessionDate), selectedDate));
+    return filteredSummary.filter(summaryItem => isSameDay(parseISO(summaryItem.sessionDate), selectedDate));
   }, [selectedDate, filteredSummary]);
 
   return (
@@ -131,23 +131,26 @@ export default function AbsencesPage() {
         </div>
 
         {view === 'list' ? (
-          <div className="p-margin flex flex-col gap-lg animate-in fade-in duration-300">
-            <section className="flex flex-col gap-sm">
+          <div className="p-margin grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
+            {/* Table on Desktop / Card List on Mobile */}
+            <section className="flex flex-col gap-sm lg:col-span-2">
               <Typography variant="label-sm" className="text-on-surface-variant font-bold ml-1">
                 Übersicht nach Modul
               </Typography>
-              <Card className="!p-0 overflow-hidden">
+              
+              {/* Mobile View Card */}
+              <Card className="!p-0 overflow-hidden lg:hidden">
                 {loading ? (
                   <div className="p-md text-center animate-pulse">Lade Absenzen...</div>
                 ) : error ? (
                   <div className="p-md text-center text-error">{error}</div>
                 ) : list.length > 0 ? (
-                  list.map((cls) => (
-                    <Link key={cls.id} href={`/absences/${cls.id}/calendar`}>
+                  list.map((classItem) => (
+                    <Link key={classItem.id} href={`/absences/${classItem.id}/calendar`}>
                       <ListEntry
-                        title={cls.name}
+                        title={classItem.name}
                         subtitle="Informatik"
-                        value={`${(cls.totalRequired - cls.totalAttended).toFixed(1)} Lekt.`}
+                        value={`${(classItem.totalRequired - classItem.totalAttended).toFixed(1)} Lekt.`}
                         icon="event_busy"
                       />
                     </Link>
@@ -158,65 +161,138 @@ export default function AbsencesPage() {
                   </div>
                 )}
               </Card>
+
+              {/* Desktop Table View */}
+              <div className="hidden lg:block overflow-x-auto bg-white rounded-2xl border border-outline-variant shadow-sm">
+                <table className="min-w-full divide-y divide-outline-variant">
+                  <thead className="bg-surface-container-low">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider">Modul</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider">Kategorie</th>
+                      <th className="px-6 py-4 text-right text-xs font-bold text-on-surface-variant uppercase tracking-wider">Verpasste Lektionen</th>
+                      <th className="px-6 py-4 text-center text-xs font-bold text-on-surface-variant uppercase tracking-wider">Aktion</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-outline-variant/60 bg-white">
+                    {loading ? (
+                      <tr>
+                        <td colSpan={4} className="px-6 py-8 text-center animate-pulse text-on-surface-variant">
+                          Lade Absenzen...
+                        </td>
+                      </tr>
+                    ) : error ? (
+                      <tr>
+                        <td colSpan={4} className="px-6 py-8 text-center text-error">
+                          {error}
+                        </td>
+                      </tr>
+                    ) : list.length > 0 ? (
+                      list.map((classItem) => (
+                        <tr key={classItem.id} className="hover:bg-surface-container-low/40 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <Typography variant="body-md" className="font-bold">{classItem.name}</Typography>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <Typography variant="body-md" className="text-on-surface-variant">Informatik</Typography>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <Typography variant="body-md" className="font-bold text-error">
+                              {(classItem.totalRequired - classItem.totalAttended).toFixed(1)} Lekt.
+                            </Typography>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                            <Link 
+                              href={`/absences/${classItem.id}/calendar`}
+                              className="inline-flex items-center justify-center px-4 py-2 bg-accent/10 hover:bg-accent/20 text-accent font-bold rounded-lg text-sm transition-colors"
+                            >
+                              Kalender anzeigen
+                            </Link>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} className="px-6 py-8 text-center text-on-surface-variant italic">
+                          {searchQuery || activeFilter !== 'All' ? 'Keine Übereinstimmungen gefunden' : 'Keine Absenzen erfasst'}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </section>
 
-            <Card variant="glass" className="flex flex-col gap-sm">
-              <Typography variant="h2">Zusammenfassung</Typography>
-              <div className="flex justify-between items-center">
-                <div className="flex flex-col">
-                  <Typography variant="display" className="text-primary">{totalMissed.toFixed(1)}</Typography>
-                  <Typography variant="label-sm" className="text-on-surface-variant">Gesamt (Lekt.)</Typography>
+            {/* Summary Card */}
+            <div className="lg:col-span-1">
+              <Card variant="glass" className="flex flex-col gap-lg p-lg shadow-lg border-accent/20">
+                <Typography variant="h2" className="text-primary border-b border-outline-variant pb-2">Zusammenfassung</Typography>
+                <div className="flex flex-col gap-6">
+                  <div className="flex justify-between items-end">
+                    <Typography variant="label-sm" className="text-on-surface-variant font-bold uppercase tracking-widest">Gesamt (Lekt.)</Typography>
+                    <Typography variant="display" className="text-primary leading-none">{totalMissed.toFixed(1)}</Typography>
+                  </div>
+                  <div className="flex justify-between items-end">
+                    <Typography variant="label-sm" className={`${openAbsencesCount > 0 ? "text-error" : "text-on-surface-variant"} font-bold uppercase tracking-widest`}>
+                      Offene Einträge
+                    </Typography>
+                    <Typography variant="display" className={`${openAbsencesCount > 0 ? "text-error" : "text-primary"} leading-none`}>
+                      {openAbsencesCount}
+                    </Typography>
+                  </div>
                 </div>
-                <div className="flex flex-col text-right">
-                  <Typography variant="display" className={openAbsencesCount > 0 ? "text-error" : "text-primary"}>
-                    {openAbsencesCount}
-                  </Typography>
-                  <Typography variant="label-sm" className={`${openAbsencesCount > 0 ? "text-error" : "text-on-surface-variant"} font-bold`}>
-                    Offene Einträge
+                
+                <div className="mt-4 p-md bg-accent/5 rounded-xl border border-accent/10">
+                  <Typography variant="body-md" className="text-on-surface-variant italic text-center">
+                    Regelmässige Präsenz ist entscheidend für Ihren Studienerfolg.
                   </Typography>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
           </div>
         ) : (
-          <div className="p-margin flex flex-col gap-lg animate-in fade-in duration-300">
-            <Calendar 
-              currentDate={currentMonth}
-              onMonthChange={setCurrentMonth}
-              onDateClick={setSelectedDate}
-              statusHighlights={statusHighlights}
-              selectedDate={selectedDate || undefined}
-            />
+          /* Calendar View - Responsive Layout */
+          <div className="p-margin grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
+            <div className="lg:col-span-2">
+              <Calendar 
+                currentDate={currentMonth}
+                onMonthChange={setCurrentMonth}
+                onDateClick={setSelectedDate}
+                statusHighlights={statusHighlights}
+                selectedDate={selectedDate || undefined}
+              />
+            </div>
 
             {/* Selected Day Details */}
-            {selectedDate && (
-              <section className="flex flex-col gap-sm">
-                <Typography variant="label-sm" className="text-on-surface-variant font-bold ml-1 uppercase">
-                  Details für {format(selectedDate, "d. MMMM", { locale: de })}
-                </Typography>
-                {selectedAbsences.length > 0 ? (
-                  <div className="flex flex-col gap-2">
-                    {selectedAbsences.map((abs, idx) => (
-                      <Card key={`${abs.classId}-${idx}`} variant="elevated" className="bg-white">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <Typography variant="body-md" className="font-bold">{abs.className}</Typography>
-                            <Typography variant="label-sm" className="text-on-surface-variant">
-                              {abs.requiredLessons} Lektionen • {abs.status || 'Offen'}
-                            </Typography>
+            <div className="lg:col-span-1">
+              {selectedDate && (
+                <section className="flex flex-col gap-sm">
+                  <Typography variant="label-sm" className="text-on-surface-variant font-bold ml-1 uppercase">
+                    Details für {format(selectedDate, "d. MMMM", { locale: de })}
+                  </Typography>
+                  {selectedAbsences.length > 0 ? (
+                    <div className="flex flex-col gap-2">
+                      {selectedAbsences.map((absenceItem, index) => (
+                        <Card key={`${absenceItem.classId}-${index}`} variant="elevated" className="bg-white">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <Typography variant="body-md" className="font-bold">{absenceItem.className}</Typography>
+                              <Typography variant="label-sm" className="text-on-surface-variant">
+                                {absenceItem.requiredLessons} Lektionen • {absenceItem.status || 'Offen'}
+                              </Typography>
+                            </div>
+                            <div className={`w-3 h-3 rounded-full ${absenceItem.status === 'Nicht teilgenommen entschuldigt' ? 'bg-success' : 'bg-error'}`} />
                           </div>
-                          <div className={`w-3 h-3 rounded-full ${abs.status === 'Nicht teilgenommen entschuldigt' ? 'bg-success' : 'bg-error'}`} />
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <Card className="p-md text-center text-on-surface-variant italic">
-                    {searchQuery || activeFilter !== 'All' ? 'Keine Übereinstimmungen für diesen Tag' : 'Keine Einträge für diesen Tag'}
-                  </Card>
-                )}
-              </section>
-            )}
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <Card className="p-md text-center text-on-surface-variant italic">
+                      {searchQuery || activeFilter !== 'All' ? 'Keine Übereinstimmungen für diesen Tag' : 'Keine Einträge für diesen Tag'}
+                    </Card>
+                  )}
+                </section>
+              )}
+            </div>
           </div>
         )}
       </div>
