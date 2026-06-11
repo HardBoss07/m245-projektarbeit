@@ -34,98 +34,109 @@ export default function DashboardPage() {
 
   // Calculate average grade
   const avgGrade = grades.length > 0 
-    ? (grades.reduce((acc, g) => acc + (g.grade ? Number(g.grade) : 0), 0) / grades.length).toFixed(1) 
+    ? (grades.reduce((accumulator, gradeItem) => accumulator + (gradeItem.grade ? Number(gradeItem.grade) : 0), 0) / grades.length).toFixed(1) 
     : '0.0';
 
   // Open absences (where status is 'Offen')
-  const openAbsences = attendance.filter(a => a.status === 'Offen').length;
+  const openAbsences = attendance.filter(absence => absence.status === 'Offen').length;
 
   return (
     <MobileShell title="Dashboard" subtitle={`Willkommen zurück, ${user?.firstName || 'Matteo'}`}>
-      <div className="p-margin flex flex-col gap-lg">
-        {/* Next Lesson Bento - Stub for now as timetable isn't fully integrated in hooks */}
-        <Link href="/schedule">
-          <BentoCard 
-            title="NÄCHSTE LEKTION" 
-            icon="schedule"
-            footer={
-              <Typography variant="label-sm" className="text-accent font-bold">
-                In Kürze • Raum unbekannt
-              </Typography>
-            }
-          >
-            <Typography variant="h2">Stundenplan ansehen</Typography>
-            <Typography variant="body-md" className="text-on-surface-variant">
-              Deine heutige Übersicht
-            </Typography>
-          </BentoCard>
-        </Link>
-
-        {/* Stats Row */}
-        <div className="grid grid-cols-2 gap-md">
-          <Link href="/grades">
-            <BentoCard title="SCHNITT">
-              <Typography variant="display" className="text-accent">{avgGrade}</Typography>
-              <Typography variant="label-sm" className="text-on-surface-variant font-bold">
-                Aktuelles Semester
-              </Typography>
-            </BentoCard>
-          </Link>
-          <Link href="/absences">
-            <BentoCard title="ABSENZEN">
-              <Typography variant="display" className={openAbsences > 0 ? "text-error" : "text-accent"}>
-                {openAbsences}
-              </Typography>
-              <Typography variant="label-sm" className="text-on-surface-variant font-bold">
-                Offene Einträge
-              </Typography>
-            </BentoCard>
-          </Link>
-        </div>
-
-        {/* Recent Activity */}
-        <section className="flex flex-col gap-sm">
-          <div className="flex items-center justify-between ml-1">
-            <Typography variant="label-sm" className="text-on-surface-variant font-bold">
-              LETZTE NOTEN
-            </Typography>
-            <Link href="/grades">
-              <Typography variant="label-sm" className="text-accent font-bold">ALLE ANZEIGEN</Typography>
-            </Link>
-          </div>
-          <Card className="!p-0 overflow-hidden">
-            {grades.length > 0 ? (
-              grades.slice(0, 3).map(grade => (
-                <ListEntry 
-                  key={grade.id}
-                  title={grade.description || 'Prüfung'} 
-                  subtitle={grade.subject} 
-                  value={grade.grade ? Number(grade.grade).toFixed(1) : 'N/A'} 
-                  icon="grade"
-                />
-              ))
-            ) : (
-              <div className="p-md text-center">
-                <Typography variant="body-md" className="text-on-surface-variant italic">
-                  Noch keine Noten vorhanden
+      <div className="p-margin flex flex-col lg:flex-row gap-8">
+        {/* Main Column: Next Lesson & Stats (2/3) */}
+        <div className="flex-1 flex flex-col gap-8 lg:max-w-[65%]">
+          {/* Next Lesson Bento */}
+          <Link href="/schedule">
+            <BentoCard 
+              title="NÄCHSTE LEKTION" 
+              icon="schedule"
+              className="lg:min-h-[200px]"
+              footer={
+                <Typography variant="label-sm" className="text-accent font-bold">
+                  In Kürze • Raum unbekannt
+                </Typography>
+              }
+            >
+              <div className="flex flex-col gap-1">
+                <Typography variant="h2" className="lg:text-4xl">Stundenplan ansehen</Typography>
+                <Typography variant="body-lg" className="text-on-surface-variant">
+                  Deine heutige Übersicht für den Schultag
                 </Typography>
               </div>
-            )}
-          </Card>
-        </section>
+            </BentoCard>
+          </Link>
 
-        {/* Illustration Card */}
-        <section className="rounded-xl overflow-hidden h-40 relative group shadow-md">
-          <img 
-            className="w-full h-full object-cover grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-75 transition-all duration-700" 
-            src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80"
-            alt="Library"
-          />
-          <div className="absolute inset-0 flex flex-col justify-end p-md bg-gradient-to-t from-black/80 to-transparent">
-            <Typography variant="h2" className="text-white">Präsenz ist der Schlüssel</Typography>
-            <Typography variant="body-md" className="text-white/70">Behalte deine Fehlzeiten im Griff für einen Erfolg.</Typography>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 gap-md">
+            <Link href="/grades">
+              <BentoCard title="SCHNITT" className="hover:shadow-md transition-shadow">
+                <Typography variant="display" className="text-accent lg:text-6xl">{avgGrade}</Typography>
+                <Typography variant="label-sm" className="text-on-surface-variant font-bold uppercase tracking-wider">
+                  Aktuelles Semester
+                </Typography>
+              </BentoCard>
+            </Link>
+            <Link href="/absences">
+              <BentoCard title="ABSENZEN" className="hover:shadow-md transition-shadow">
+                <Typography variant="display" className={`${openAbsences > 0 ? "text-error" : "text-accent"} lg:text-6xl`}>
+                  {openAbsences}
+                </Typography>
+                <Typography variant="label-sm" className="text-on-surface-variant font-bold uppercase tracking-wider">
+                  Offene Einträge
+                </Typography>
+              </BentoCard>
+            </Link>
           </div>
-        </section>
+          
+          {/* Recent Activity (Moved here for desktop or kept in right column? Let's keep it in right but add more here if needed) */}
+        </div>
+
+        {/* Sidebar Column: Recent Activity & Illustration (1/3) */}
+        <div className="flex flex-col gap-8 lg:w-[350px]">
+          {/* Recent Activity */}
+          <section className="flex flex-col gap-sm">
+            <div className="flex items-center justify-between ml-1">
+              <Typography variant="label-sm" className="text-on-surface-variant font-bold uppercase tracking-widest">
+                Letzte Noten
+              </Typography>
+              <Link href="/grades">
+                <Typography variant="label-sm" className="text-accent font-bold hover:underline">ALLE ANZEIGEN</Typography>
+              </Link>
+            </div>
+            <Card className="!p-0 overflow-hidden shadow-sm">
+              {grades.length > 0 ? (
+                grades.slice(0, 4).map(grade => (
+                  <ListEntry 
+                    key={grade.id}
+                    title={grade.description || 'Prüfung'} 
+                    subtitle={grade.subject} 
+                    value={grade.grade ? Number(grade.grade).toFixed(1) : 'N/A'} 
+                    icon="grade"
+                  />
+                ))
+              ) : (
+                <div className="p-md text-center">
+                  <Typography variant="body-md" className="text-on-surface-variant italic">
+                    Noch keine Noten vorhanden
+                  </Typography>
+                </div>
+              )}
+            </Card>
+          </section>
+
+          {/* Illustration Card */}
+          <section className="rounded-xl overflow-hidden h-48 relative group shadow-md hidden md:block">
+            <img 
+              className="w-full h-full object-cover grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-75 transition-all duration-700" 
+              src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80"
+              alt="Library"
+            />
+            <div className="absolute inset-0 flex flex-col justify-end p-md bg-gradient-to-t from-black/90 to-transparent">
+              <Typography variant="h2" className="text-white">Präsenz ist der Schlüssel</Typography>
+              <Typography variant="body-md" className="text-white/70">Behalte deine Fehlzeiten im Griff für deinen Erfolg.</Typography>
+            </div>
+          </section>
+        </div>
       </div>
     </MobileShell>
   );
