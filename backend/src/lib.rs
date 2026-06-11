@@ -30,6 +30,7 @@ pub async fn create_app(state: AppState) -> Router {
     Router::new()
         .nest("/api/v1", routes::api_versioning::api_v1_routes(state))
         .layer(CompressionLayer::new())
+        .layer(axum::middleware::from_fn(middleware::logging::logging_middleware))
         .layer(TimeoutLayer::with_status_code(
             axum::http::StatusCode::REQUEST_TIMEOUT,
             Duration::from_secs(30),
