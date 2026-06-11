@@ -22,15 +22,17 @@ export default function FilesPage() {
 
   return (
     <MobileShell title="Meine Dateien">
-      <div className="p-margin flex flex-col gap-lg">
-        <SearchBar placeholder="Dateien oder Ordner suchen..." />
+      <div className="p-margin flex flex-col lg:grid lg:grid-cols-3 gap-lg">
+        <div className="lg:col-span-3">
+          <SearchBar placeholder="Dateien oder Ordner suchen..." />
+        </div>
 
-        {/* Folders */}
-        <section className="flex flex-col gap-sm">
+        {/* Left Column: Folders */}
+        <section className="flex flex-col gap-sm lg:col-span-2">
           <Typography variant="label-sm" className="text-on-surface-variant font-bold ml-1">ORDNER</Typography>
-          <div className="grid grid-cols-2 gap-md">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-md">
             {folders.map((folder, i) => (
-              <Card key={i} className="flex flex-col gap-xs active:bg-surface-container transition-colors">
+              <Card key={i} className="flex flex-col gap-xs active:bg-surface-container transition-colors hover:shadow-md">
                 <div className="w-10 h-10 rounded-lg bg-primary-container/10 text-primary-container flex items-center justify-center">
                   <span className="material-symbols-outlined">folder</span>
                 </div>
@@ -41,34 +43,37 @@ export default function FilesPage() {
           </div>
         </section>
 
-        {/* Recent Files */}
-        <section className="flex flex-col gap-sm">
-          <Typography variant="label-sm" className="text-on-surface-variant font-bold ml-1">KÜRZLICH VERWENDET</Typography>
-          <Card className="!p-0 overflow-hidden">
-            {recentFiles.map((file, i) => (
-              <ListEntry
-                key={i}
-                title={file.name}
-                subtitle={`${file.size} • ${file.date}`}
-                icon={file.type === 'PDF' ? 'picture_as_pdf' : 'description'}
-                onClick={() => {}}
-              />
-            ))}
-          </Card>
-        </section>
+        {/* Right Column: Recent Files & Upload */}
+        <div className="flex flex-col gap-lg lg:col-span-1">
+          {/* Recent Files */}
+          <section className="flex flex-col gap-sm">
+            <Typography variant="label-sm" className="text-on-surface-variant font-bold ml-1">KÜRZLICH VERWENDET</Typography>
+            <Card className="!p-0 overflow-hidden">
+              {recentFiles.map((file, i) => (
+                <ListEntry
+                  key={i}
+                  title={file.name}
+                  subtitle={`${file.size} • ${file.date}`}
+                  icon={file.type === 'PDF' ? 'picture_as_pdf' : 'description'}
+                  onClick={() => {}}
+                />
+              ))}
+            </Card>
+          </section>
 
-        {/* Quick Upload Action */}
-        <Card variant="glass" className="flex items-center justify-between py-md border-dashed border-2 border-accent/30 bg-accent/5">
-          <div className="flex items-center gap-md">
-            <div className="w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center shadow-md">
-              <span className="material-symbols-outlined">upload</span>
+          {/* Quick Upload Action */}
+          <Card variant="glass" className="flex items-center justify-between py-md border-dashed border-2 border-accent/30 bg-accent/5">
+            <div className="flex items-center gap-md">
+              <div className="w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center shadow-md">
+                <span className="material-symbols-outlined">upload</span>
+              </div>
+              <div>
+                <Typography variant="body-md" className="font-bold">Datei hochladen</Typography>
+                <Typography variant="label-sm" className="text-on-surface-variant">PDF, DOCX bis 20MB</Typography>
+              </div>
             </div>
-            <div>
-              <Typography variant="body-md" className="font-bold">Datei hochladen</Typography>
-              <Typography variant="label-sm" className="text-on-surface-variant">PDF, DOCX bis 20MB</Typography>
-            </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
       </div>
     </MobileShell>
   );
