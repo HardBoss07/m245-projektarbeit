@@ -18,7 +18,7 @@ export const MobileShell: React.FC<MobileShellProps> = ({
   return (
     <div className="flex flex-col min-h-screen bg-surface">
       <Header title={title} subtitle={subtitle} showBack={showBack} />
-      <main className="flex-1 pb-[92px]">
+      <main className="flex-1 w-full max-w-7xl mx-auto pb-[92px] lg:pb-12 px-0 md:px-6 lg:px-8">
         {children}
       </main>
       <BottomNav />

@@ -33,6 +33,18 @@
   --spacing-margin: 20px;
   --spacing-gutter: 12px;
 
+  @media (min-width: 768px) {
+    --spacing-margin: 24px;
+    --spacing-lg: 32px;
+    --spacing-xl: 48px;
+  }
+
+  @media (min-width: 1024px) {
+    --spacing-margin: 32px;
+    --spacing-lg: 40px;
+    --spacing-xl: 64px;
+  }
+
   --radius-sm: 0.25rem;
   --radius-DEFAULT: 0.5rem;
   --radius-md: 0.75rem;

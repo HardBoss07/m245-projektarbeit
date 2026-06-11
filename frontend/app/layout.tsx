@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import lexend from "@/styles/fonts";
 import "./globals.css";
+import { AppLayout } from "@/components/organisms/AppLayout";
 
 export const metadata: Metadata = {
   title: "Wiss Tocco Redesign",
@@ -21,7 +22,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {children}
+        <AppLayout>{children}</AppLayout>
       </body>
     </html>
   );

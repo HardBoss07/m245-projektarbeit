@@ -16,7 +16,7 @@ export function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 w-full z-50 bg-surface/80 backdrop-blur-md border-t border-outline-variant flex justify-around items-center h-20 px-2 pb-safe shadow-sm">
+    <nav className="fixed bottom-0 w-full z-50 bg-surface/80 backdrop-blur-md border-t border-outline-variant flex justify-around items-center h-20 px-2 pb-safe shadow-sm lg:hidden">
       {navItems.map((item) => (
         <NavTab
           key={item.href}

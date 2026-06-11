@@ -17,7 +17,7 @@ export const BottomNav: React.FC = () => {
   if (pathname === '/') return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-outline-variant shadow-[0_-4px_16px_rgba(0,0,0,0.05)] h-20 w-full">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-outline-variant shadow-[0_-4px_16px_rgba(0,0,0,0.05)] h-20 w-full lg:hidden">
       <div className="grid grid-cols-4 w-full h-full">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
