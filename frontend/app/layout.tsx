@@ -6,6 +6,9 @@ import { AppLayout } from "@/components/organisms/AppLayout";
 export const metadata: Metadata = {
   title: "Wiss Tocco Redesign",
   description: "Academic Excellence and Digital Fluidity",
+  other: {
+    "stylesheet": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+  }
 };
 
 export default function RootLayout({
@@ -15,14 +18,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de" className={`${lexend.variable}`}>
-      <head>
-        <link 
-          rel="stylesheet" 
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" 
-        />
-      </head>
       <body>
-        <AppLayout>{children}</AppLayout>
+        {children}
       </body>
     </html>
   );
