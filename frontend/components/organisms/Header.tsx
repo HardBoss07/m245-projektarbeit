@@ -16,7 +16,7 @@ export const Header: React.FC<HeaderProps> = ({ title, subtitle, showBack = fals
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-outline-variant w-full">
-      <div className="max-w-7xl mx-auto px-margin md:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-margin py-4 flex items-center justify-between">
         <div className="flex items-center gap-md">
           {showBack && (
             <button 

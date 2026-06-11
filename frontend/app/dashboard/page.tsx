@@ -70,7 +70,7 @@ export default function DashboardPage() {
           <div className="grid grid-cols-2 gap-md">
             <Link href="/grades">
               <BentoCard title="SCHNITT" className="hover:shadow-md transition-shadow">
-                <Typography variant="display" className="text-accent lg:text-6xl">{avgGrade}</Typography>
+                <Typography variant="display" className="text-accent">{avgGrade}</Typography>
                 <Typography variant="label-sm" className="text-on-surface-variant font-bold uppercase tracking-wider">
                   Aktuelles Semester
                 </Typography>
@@ -78,7 +78,7 @@ export default function DashboardPage() {
             </Link>
             <Link href="/absences">
               <BentoCard title="ABSENZEN" className="hover:shadow-md transition-shadow">
-                <Typography variant="display" className={`${openAbsences > 0 ? "text-error" : "text-accent"} lg:text-6xl`}>
+                <Typography variant="display" className={openAbsences > 0 ? "text-error" : "text-accent"}>
                   {openAbsences}
                 </Typography>
                 <Typography variant="label-sm" className="text-on-surface-variant font-bold uppercase tracking-wider">
