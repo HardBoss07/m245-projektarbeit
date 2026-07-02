@@ -7,8 +7,8 @@ use moka::future::Cache;
 use serde_json::Value;
 use tower::ServiceExt;
 use uuid::Uuid;
-use wiss_tocco_backend::services::auth::create_token;
-use wiss_tocco_backend::{AppState, create_app};
+use wiss_estudio_backend::services::auth::create_token;
+use wiss_estudio_backend::{AppState, create_app};
 
 #[tokio::test]
 async fn test_document_scoping_and_permissions() {

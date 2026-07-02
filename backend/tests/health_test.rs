@@ -5,7 +5,7 @@ use axum::{
 use moka::future::Cache;
 use std::time::Duration;
 use tower::ServiceExt;
-use wiss_tocco_backend::{AppState, create_app};
+use wiss_estudio_backend::{AppState, create_app};
 
 #[tokio::test]
 async fn test_health_check() {

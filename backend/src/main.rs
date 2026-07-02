@@ -2,7 +2,7 @@ use moka::future::Cache;
 use sqlx::postgres::PgPoolOptions;
 use std::time::Duration;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-use wiss_tocco_backend::{AppState, create_app};
+use wiss_estudio_backend::{AppState, create_app};
 
 #[tokio::main]
 async fn main() {
@@ -12,7 +12,7 @@ async fn main() {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "wiss_tocco_backend=debug,tower_http=debug".into()),
+                .unwrap_or_else(|_| "wiss_estudio_backend=debug,tower_http=debug".into()),
         )
         .with(tracing_subscriber::fmt::layer())
         .init();

@@ -2997,7 +2997,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "wiss-tocco-backend"
+name = "wiss-estudio-backend"
 version = "0.1.0"
 dependencies = [
  "anyhow",

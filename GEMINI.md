@@ -1,8 +1,8 @@
-# Wiss Tocco Redesign
+# Wiss Estudio Redesign
 
 ## 1. Project Overview
 
-The **Wiss Tocco Redesign** is a comprehensive modernization of the `wiss.tocco.ch` school portal. The current system suffers from poor mobile usability and frequent session expirations. This project focuses on a "Mobile-First" makeover, emphasizing performance, modern UI/UX, and improved session handling via JWT.
+The **Wiss Estudio Redesign** is a comprehensive modernization of the `wiss.tocco.ch` school portal. The current system suffers from poor mobile usability and frequent session expirations. This project focuses on a "Mobile-First" makeover, emphasizing performance, modern UI/UX, and improved session handling via JWT.
 
 ### Core Objectives
 

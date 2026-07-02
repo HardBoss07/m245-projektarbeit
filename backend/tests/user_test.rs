@@ -8,8 +8,8 @@ use serde_json::{Value, json};
 use std::time::Duration;
 use tower::ServiceExt;
 use uuid::Uuid;
-use wiss_tocco_backend::services::auth::create_token;
-use wiss_tocco_backend::{AppState, create_app};
+use wiss_estudio_backend::services::auth::create_token;
+use wiss_estudio_backend::{AppState, create_app};
 
 #[tokio::test]
 async fn test_get_me() {

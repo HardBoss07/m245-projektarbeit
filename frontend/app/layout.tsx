@@ -4,7 +4,7 @@ import "./globals.css";
 import { AppLayout } from "@/components/organisms/AppLayout";
 
 export const metadata: Metadata = {
-  title: "Wiss Tocco Redesign",
+  title: "Wiss Estudio Redesign",
   description: "Academic Excellence and Digital Fluidity",
 };
 

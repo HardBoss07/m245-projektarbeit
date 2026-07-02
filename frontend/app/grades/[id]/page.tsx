@@ -54,7 +54,7 @@ export default function GradeDetailPage({ params }: { params: Promise<{ id: stri
             </div>
             <div className="text-right">
               <Typography variant="body-md" className="font-bold">Semester 4</Typography>
-              <Typography variant="label-sm" className="text-on-surface-variant">WISS Tocco</Typography>
+              <Typography variant="label-sm" className="text-on-surface-variant">WISS Estudio</Typography>
             </div>
           </Card>
 

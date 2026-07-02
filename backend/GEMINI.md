@@ -1,4 +1,4 @@
-# Wiss Tocco Backend: Technical Specification
+# Wiss Estudio Backend: Technical Specification
 
 ## 1. Project Overview
 

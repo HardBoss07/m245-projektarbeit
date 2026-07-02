@@ -44,7 +44,7 @@ export default function LoginPage() {
             <Icon name="school" className="text-4xl" />
           </div>
           <div className="text-center">
-            <Typography variant="display" className="tracking-tighter">WISS TOCCO</Typography>
+            <Typography variant="display" className="tracking-tighter">WISS ESTUDIO</Typography>
             <Typography variant="body-md" className="text-on-surface-variant">
               Academic Excellence & Clarity
             </Typography>

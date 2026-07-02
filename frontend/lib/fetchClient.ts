@@ -1,5 +1,5 @@
 /**
- * Core HTTP Client for Wiss Tocco Redesign
+ * Core HTTP Client for Wiss Estudio Redesign
  * Implements JWT management and 401 retry queue logic.
  */
 

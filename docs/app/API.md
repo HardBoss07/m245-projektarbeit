@@ -1,6 +1,6 @@
-# Wiss Tocco API Documentation
+# Wiss Estudio API Documentation
 
-This document describes the REST API for the Wiss Tocco Redesign project.
+This document describes the REST API for the Wiss Estudio Redesign project.
 
 **Base URL:** `/api/v1`
 

@@ -35,7 +35,7 @@ export const SidebarNav: React.FC = () => {
             <Icon name="school" className="text-2xl" />
           </div>
           <div>
-            <Typography variant="h2" className="tracking-tight leading-none">WISS TOCCO</Typography>
+            <Typography variant="h2" className="tracking-tight leading-none">WISS ESTUDIO</Typography>
             <Typography variant="label-sm" className="text-on-surface-variant text-[10px] tracking-widest mt-1">
               Portal
             </Typography>

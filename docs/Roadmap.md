@@ -11,7 +11,7 @@ Diese rückwirkende Roadmap dokumentiert die Meilensteine und erledigten Pendenz
   - Definition der Design Tokens und der funktionalen Basis-Struktur.
   - Systematischer Aufbau der UI-Komponenten nach Atomic Design (Atoms, Molecules, Organisms).
 - **Projektinfrastruktur:**
-  - Initialisierung der Projektpakete für das Frontend (`wiss-tocco-frontend`) und Backend (`wiss-tocco-backend`).
+  - Initialisierung der Projektpakete für das Frontend (`wiss-estudio-frontend`) und Backend (`wiss-estudio-backend`).
   - Aufsetzen einer optimierten Multi-Stage Docker-Umgebung inklusive Datenbank-Services.
 - **Datenbank-Core:**
   - Entwurf des initialen Datenbankschemas und Erstellung der Migrationen (`schema.sql`).
